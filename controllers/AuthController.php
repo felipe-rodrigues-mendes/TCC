@@ -96,11 +96,17 @@ class AuthController {
             $nome = trim($_POST['nome'] ?? '');
             $email = trim($_POST['email'] ?? '');
             $senha = trim($_POST['senha'] ?? '');
+            $confirmarSenha = trim((string)($_POST['confirmar_senha'] ?? ''));
+            $aceitaTermos = (($_POST['aceita_termos'] ?? '') === '1');
 
-            if (empty($nome) || empty($email) || empty($senha)) {
-                $mensagem = 'Nome, email e senha são obrigatórios.';
+            if (empty($nome) || empty($email) || empty($senha) || empty($confirmarSenha)) {
+                $mensagem = 'Nome, email, senha e confirmação de senha são obrigatórios.';
             } elseif (strlen($senha) < 6) {
                 $mensagem = 'Senha deve ter no mínimo 6 caracteres.';
+            } elseif ($senha !== $confirmarSenha) {
+                $mensagem = 'A confirmação da senha não confere.';
+            } elseif (!$aceitaTermos) {
+                $mensagem = 'Você precisa concordar com os termos de uso para continuar.';
             } else {
                 $usuarioId = $this->userDAO->register($nome, $email, $senha);
 
