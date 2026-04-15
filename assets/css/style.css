@@ -913,6 +913,15 @@ footer{
     color: var(--texto) !important;
 }
 
+[data-theme="dark"] .necessidades-box h3{
+    color: var(--texto) !important;
+}
+
+[data-theme="dark"] .necessidades-box li,
+[data-theme="dark"] .necessidades-box p{
+    color: var(--texto-suave) !important;
+}
+
 [data-theme="dark"] .cards-toggle,
 [data-theme="dark"] .cards-side-panel,
 [data-theme="dark"] .empty-state{
@@ -926,6 +935,7 @@ footer{
 [data-theme="dark"] .channel-item,
 [data-theme="dark"] .helper,
 [data-theme="dark"] .muted,
+[data-theme="dark"] .panel-card p,
 [data-theme="dark"] .endereco-info,
 [data-theme="dark"] .obs-item,
 [data-theme="dark"] .timeline-text,
@@ -933,6 +943,46 @@ footer{
 [data-theme="dark"] .panel-card > p,
 [data-theme="dark"] .about-container p,
 [data-theme="dark"] .about-container li{
+    color: var(--texto-suave) !important;
+}
+
+[data-theme="dark"] .panel-card h1,
+[data-theme="dark"] .panel-card h2,
+[data-theme="dark"] .panel-card h3,
+[data-theme="dark"] .cards-toggle summary,
+[data-theme="dark"] .need-card strong,
+[data-theme="dark"] .need-row-title,
+[data-theme="dark"] .campaign-info strong,
+[data-theme="dark"] .point-card h3,
+[data-theme="dark"] .card-ponto h3,
+[data-theme="dark"] .ponto-titulo,
+[data-theme="dark"] .impact-card h2,
+[data-theme="dark"] .story-card h2,
+[data-theme="dark"] .gallery-card h2,
+[data-theme="dark"] .steps-card h2,
+[data-theme="dark"] .step-card h3,
+[data-theme="dark"] .value-row strong{
+    color: var(--texto) !important;
+}
+
+[data-theme="dark"] .impact-card p,
+[data-theme="dark"] .story-card p,
+[data-theme="dark"] .gallery-card p,
+[data-theme="dark"] .steps-card p,
+[data-theme="dark"] .need-card div,
+[data-theme="dark"] .itens-lista li,
+[data-theme="dark"] .vazio{
+    color: var(--texto-suave) !important;
+}
+
+[data-theme="dark"] .info-ponto a,
+[data-theme="dark"] .channel-item a,
+[data-theme="dark"] .need-card span{
+    color: var(--link) !important;
+}
+
+[data-theme="dark"] .campaign-info.is-closed,
+[data-theme="dark"] .status-badge.is-closed{
     color: var(--texto-suave) !important;
 }
 
@@ -954,7 +1004,12 @@ footer{
 
 [data-theme="dark"] .doacoes-tabela,
 [data-theme="dark"] .map-wrap{
+    background: var(--bg-surface) !important;
     border-color: var(--cinza-borda) !important;
+}
+
+[data-theme="dark"] table{
+    color: var(--texto) !important;
 }
 
 [data-theme="dark"] th{
@@ -1070,8 +1125,31 @@ footer{
 }
 
 @media (min-width: 1181px){
+    .site-header{
+        flex-direction: row;
+        align-items: center;
+        gap: 24px;
+    }
+
+    .header-top{
+        display: contents;
+    }
+
+    .logo-container{
+        flex-shrink: 0;
+    }
+
     .main-nav{
         display: flex !important;
+        order: 2;
+        flex: 1;
+        justify-content: flex-start;
+    }
+
+    .header-actions{
+        order: 3;
+        margin-left: 0;
+        flex-shrink: 0;
     }
 }
 

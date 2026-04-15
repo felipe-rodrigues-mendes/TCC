@@ -63,6 +63,7 @@ $routes = [
     'admin_upload_campaign_image' => ['AdminController', 'uploadCampaignImage'],
     'admin_add_campaign_card' => ['AdminController', 'addCampaignCard'],
     'admin_promote_user' => ['AdminController', 'promoteUser'],
+    'admin_demote_user' => ['AdminController', 'demoteUser'],
     'admin_toggle_user_status' => ['AdminController', 'toggleUserStatus'],
     'admin_delete_user' => ['AdminController', 'toggleUserStatus'],
     'admin_distributions' => ['DistributionController', 'manage'],

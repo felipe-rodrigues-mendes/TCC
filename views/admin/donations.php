@@ -175,11 +175,12 @@ SessionManager::requireRole('admin');
             border: 1px solid #bfdbfe;
             border-radius: 12px;
             padding: 16px;
-            margin-bottom: 20px;
+            margin-bottom: 28px;
         }
 
         .codigo-box h3 {
-            margin-bottom: 12px;
+            margin-top: 0;
+            margin-bottom: 18px;
         }
 
         .codigo-box label {
@@ -470,9 +471,28 @@ SessionManager::requireRole('admin');
                     <div class="muted">Nenhum administrador encontrado.</div>
                 <?php else: ?>
                     <?php foreach ($admins as $admin): ?>
+                        <?php
+                            $isProtectedAdmin = isset($protectedAdminEmail) && strcasecmp((string)$admin->email, (string)$protectedAdminEmail) === 0;
+                            $isCurrentAdmin = (int)$admin->id === (int)(SessionManager::getUserId() ?? 0);
+                        ?>
                         <div class="user-badge">
-                            <strong><?php echo htmlspecialchars($admin->nome); ?></strong>
-                            <span class="muted"><?php echo htmlspecialchars($admin->email); ?></span>
+                            <div>
+                                <strong><?php echo htmlspecialchars($admin->nome); ?></strong>
+                                <div class="muted"><?php echo htmlspecialchars($admin->email); ?></div>
+                            </div>
+                            <div class="user-actions">
+                                <?php if ($isProtectedAdmin): ?>
+                                    <span class="current-user-note">Admin principal protegido</span>
+                                <?php elseif ($isCurrentAdmin): ?>
+                                    <span class="current-user-note">Usuário atual</span>
+                                <?php else: ?>
+                                    <form method="POST" action="index.php?page=admin_demote_user" onsubmit="return confirm('Tem certeza que deseja remover o acesso de admin deste usuário?');">
+                                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(SessionManager::getCsrfToken()); ?>">
+                                        <input type="hidden" name="usuario_id" value="<?php echo (int)$admin->id; ?>">
+                                        <button type="submit" class="btn-toggle-user deactivate">Remover admin</button>
+                                    </form>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -500,7 +520,13 @@ SessionManager::requireRole('admin');
                             </div>
 
                             <div class="user-actions">
-                                <?php if ((int)$usuario->id !== (int)(SessionManager::getUserId() ?? 0)): ?>
+                                <?php
+                                    $isProtectedAdmin = isset($protectedAdminEmail) && strcasecmp((string)$usuario->email, (string)$protectedAdminEmail) === 0;
+                                    $isCurrentUser = (int)$usuario->id === (int)(SessionManager::getUserId() ?? 0);
+                                ?>
+                                <?php if ($isProtectedAdmin): ?>
+                                    <span class="current-user-note">Admin principal protegido</span>
+                                <?php elseif (!$isCurrentUser): ?>
                                     <form method="POST" action="index.php?page=admin_toggle_user_status" onsubmit="return confirm('Tem certeza que deseja <?php echo $usuario->ativo ? 'desativar' : 'ativar'; ?> este usuário?');">
                                         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(SessionManager::getCsrfToken()); ?>">
                                         <input type="hidden" name="usuario_id" value="<?php echo (int)$usuario->id; ?>">
