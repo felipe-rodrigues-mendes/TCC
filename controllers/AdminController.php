@@ -14,6 +14,8 @@ require_once __DIR__ . '/SessionManager.php';
  * Compatível com o schema atual: doação, estoque, item_estoque.
  */
 class AdminController {
+    private const PROTECTED_ADMIN_EMAIL = 'admin@conectasolidaria.local';
+
     private $donationDAO;
     private $inventoryDAO;
     private $campaignDAO;
@@ -35,6 +37,17 @@ class AdminController {
      */
     private function requireAdmin(): void {
         SessionManager::requireRole('admin');
+    }
+
+    /**
+     * Define se o usuário é o administrador principal protegido do sistema.
+     */
+    private function isProtectedSystemAdmin($usuario): bool {
+        if (!$usuario || !isset($usuario->email)) {
+            return false;
+        }
+
+        return strcasecmp(trim((string)$usuario->email), self::PROTECTED_ADMIN_EMAIL) === 0;
     }
 
     /**
@@ -135,6 +148,7 @@ class AdminController {
         $usuariosDisponiveis = $this->userDAO->findByType('doador');
         $admins = $this->userDAO->findByType('admin');
         $usuariosCadastrados = $this->userDAO->findAll();
+        $protectedAdminEmail = self::PROTECTED_ADMIN_EMAIL;
         $flash = SessionManager::getMessage();
         $mensagem = $flash['mensagem'] ?? '';
         $tipoMensagem = $flash['tipo'] ?? '';
@@ -742,6 +756,65 @@ class AdminController {
     }
 
     /**
+     * Rebaixa um administrador para perfil de usuário (doador).
+     */
+    public function demoteUser(): void {
+        $this->requireAdmin();
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: index.php?page=admin_donations');
+            exit;
+        }
+
+        if (!SessionManager::validateCsrfToken($_POST['csrf_token'] ?? null)) {
+            SessionManager::setMessage('Sua sessão expirou. Atualize a página e tente novamente.', 'erro');
+            header('Location: index.php?page=admin_donations');
+            exit;
+        }
+
+        $usuarioId = (int)($_POST['usuario_id'] ?? 0);
+        if ($usuarioId <= 0) {
+            SessionManager::setMessage('Selecione um administrador válido para remover o acesso.', 'erro');
+            header('Location: index.php?page=admin_donations');
+            exit;
+        }
+
+        if ($usuarioId === (int)(SessionManager::getUserId() ?? 0)) {
+            SessionManager::setMessage('Você não pode remover o seu próprio acesso de administrador.', 'erro');
+            header('Location: index.php?page=admin_donations');
+            exit;
+        }
+
+        $usuario = $this->userDAO->findById($usuarioId);
+        if (!$usuario) {
+            SessionManager::setMessage('Usuário não encontrado.', 'erro');
+            header('Location: index.php?page=admin_donations');
+            exit;
+        }
+
+        if ($usuario->perfil_nome !== 'admin') {
+            SessionManager::setMessage('Esse usuário já não possui perfil de administrador.', 'erro');
+            header('Location: index.php?page=admin_donations');
+            exit;
+        }
+
+        if ($this->isProtectedSystemAdmin($usuario)) {
+            SessionManager::setMessage('O administrador principal não pode perder o acesso de admin.', 'erro');
+            header('Location: index.php?page=admin_donations');
+            exit;
+        }
+
+        if ($this->userDAO->demoteToDoador($usuarioId)) {
+            SessionManager::setMessage('Administrador rebaixado para usuário com sucesso.', 'sucesso');
+        } else {
+            SessionManager::setMessage('Não foi possível remover o acesso de administrador deste usuário.', 'erro');
+        }
+
+        header('Location: index.php?page=admin_donations');
+        exit;
+    }
+
+    /**
      * Ativa ou desativa um usuário cadastrado.
      */
     public function toggleUserStatus(): void {
@@ -779,6 +852,12 @@ class AdminController {
         }
 
         $novoStatus = !$usuario->ativo;
+
+        if ($this->isProtectedSystemAdmin($usuario) && !$novoStatus) {
+            SessionManager::setMessage('O administrador principal não pode ser desativado.', 'erro');
+            header('Location: index.php?page=admin_donations');
+            exit;
+        }
 
         if ($this->userDAO->updateActiveStatus($usuarioId, $novoStatus)) {
             $acao = $novoStatus ? 'ativado' : 'desativado';

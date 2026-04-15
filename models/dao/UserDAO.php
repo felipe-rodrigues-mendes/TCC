@@ -460,6 +460,37 @@ class UserDAO {
 
         return $afetados >= 0;
     }
+
+    /**
+     * Rebaixa um administrador para perfil de doador.
+     * @param int $usuarioId
+     * @return bool
+     */
+    public function demoteToDoador(int $usuarioId): bool {
+        $perfilId = $this->getPerfilIdByNome('doador');
+        if ($perfilId === null) {
+            return false;
+        }
+
+        $sql = 'UPDATE usuario SET id_perfil = ? WHERE id_usuario = ? LIMIT 1';
+        $stmt = $this->conn->prepare($sql);
+
+        if (!$stmt) {
+            error_log('Erro ao preparar rebaixamento de usuário para doador: ' . $this->conn->error);
+            return false;
+        }
+
+        $stmt->bind_param('ii', $perfilId, $usuarioId);
+        $executou = $stmt->execute();
+        $afetados = $stmt->affected_rows;
+        $stmt->close();
+
+        if (!$executou) {
+            return false;
+        }
+
+        return $afetados >= 0;
+    }
 }
 
 
