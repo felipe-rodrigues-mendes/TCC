@@ -1,6 +1,6 @@
 <?php
 // Navbar compartilhada - refatorada de menu.php
-// Esta navbar é incluída em todas as páginas via layout base
+// Esta navbar e incluida em todas as paginas via layout base
 SessionManager::start();
 $isAuthenticated = SessionManager::isAuthenticated();
 $isAdmin = SessionManager::isAdmin();
@@ -27,7 +27,7 @@ $userName = SessionManager::getUserName();
     <div class="header-top">
         <div class="logo-container">
             <a href="index.php">
-            <img src="assets/uploas/logo.PNG" class="logo" alt="Logo ConectaSolidária">
+            <img src="assets/uploas/logo.PNG" class="logo" alt="Logo ConectaSolid&aacute;ria">
             </a>
     </div>
 
@@ -41,27 +41,36 @@ $userName = SessionManager::getUserName();
             </button>
         </div>
     </div>
-
     <nav class="main-nav" id="mainNav">
-        <a href="index.php"><i class="fas fa-home"></i> Início</a>
-        <?php if (!$isAuthenticated): ?>
-            <a href="index.php?page=register"><i class="fa fa-user"></i> Cadastro</a>
-            <a href="index.php?page=login"><i class="fas fa-sign-in-alt"></i> Login</a>
+        <?php if ($isAuthenticated && $isAdmin): ?>
+            <a href="index.php?page=admin_donations"><i class="fas fa-user-shield"></i> Admin</a>
+            <a href="index.php?page=admin_campaign_cards"><i class="fas fa-layer-group"></i> Campanhas</a>
+            <a href="index.php?page=admin_inventory"><i class="fas fa-boxes-stacked"></i> Estoque</a>
+            <a href="index.php?page=admin_distributions"><i class="fas fa-truck"></i> Distribui&ccedil;&otilde;es</a>
+            <a href="index.php?page=dashboard"><i class="fas fa-user-circle"></i> Painel</a>
+            <a href="index.php"><i class="fas fa-home"></i> In&iacute;cio</a>
+            <a href="index.php?page=collection_points"><i class="fas fa-location-dot"></i> Pontos de Coleta</a>
+            <a href="index.php?page=donation_create"><i class="fas fa-hand-holding-heart"></i> Fazer Doa&ccedil;&atilde;o</a>
+            <a href="index.php?page=contact"><i class="fas fa-envelope"></i> Contato</a>
+            <a href="index.php?page=about"><i class="fas fa-info-circle"></i> Sobre</a>
+        <?php else: ?>
+            <a href="index.php"><i class="fas fa-home"></i> In&iacute;cio</a>
+            <?php if (!$isAuthenticated): ?>
+                <a href="index.php?page=register"><i class="fa fa-user"></i> Cadastro</a>
+                <a href="index.php?page=login"><i class="fas fa-sign-in-alt"></i> Login</a>
+            <?php endif; ?>
+            <a href="index.php?page=collection_points"><i class="fas fa-location-dot"></i> Pontos de Coleta</a>
+            <?php if ($isAuthenticated): ?>
+                <a href="index.php?page=donation_create"><i class="fas fa-hand-holding-heart"></i> Fazer Doa&ccedil;&atilde;o</a>
+            <?php endif; ?>
+            <a href="index.php?page=contact"><i class="fas fa-envelope"></i> Contato</a>
+            <a href="index.php?page=about"><i class="fas fa-info-circle"></i> Sobre</a>
+            <?php if ($isAuthenticated): ?>
+                <a href="index.php?page=dashboard"><i class="fas fa-user-circle"></i> Painel</a>
+            <?php endif; ?>
         <?php endif; ?>
-        <a href="index.php?page=collection_points"><i class="fas fa-location-dot"></i> Pontos de Coleta</a>
-        <a href="index.php?page=contact"><i class="fas fa-envelope"></i> Contato</a>
-        <a href="index.php?page=about"><i class="fas fa-info-circle"></i> Sobre</a>
 
         <?php if ($isAuthenticated): ?>
-            <a href="index.php?page=donation_create"><i class="fas fa-hand-holding-heart"></i> Fazer Doação</a>
-
-            <?php if ($isAdmin): ?>
-                <a href="index.php?page=admin_donations"><i class="fas fa-user-shield"></i> Admin</a>
-                <a href="index.php?page=admin_campaign_cards"><i class="fas fa-layer-group"></i> Campanhas</a>
-                <a href="index.php?page=admin_inventory"><i class="fas fa-boxes-stacked"></i> Estoque</a>
-                <a href="index.php?page=admin_distributions"><i class="fas fa-truck"></i> Distribuições</a>
-            <?php endif; ?>
-            <a href="index.php?page=dashboard"><i class="fas fa-user-circle"></i> Painel</a>
             <a href="index.php?page=logout" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Sair</a>
         <?php endif; ?>
     </nav>
@@ -135,3 +144,4 @@ $userName = SessionManager::getUserName();
         }
     })();
 </script>
+

@@ -8,10 +8,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro - ConectaSolidária</title>
+    <title>Cadastro - ConectaSolid&aacute;ria</title>
     <link rel="stylesheet" href="assets/css/style.css?v=<?= time(); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    
+
     <style>
         .mensagem {
             margin-bottom: 15px;
@@ -53,6 +53,36 @@
         .form-section a:hover {
             text-decoration: underline;
         }
+
+        .terms-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin: 4px 0 16px;
+        }
+
+        .terms-group input[type="checkbox"] {
+            width: auto;
+            margin: 3px 0 0;
+        }
+
+        .terms-group label {
+            margin: 0;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .required-mark {
+            color: #dc2626;
+            font-weight: 700;
+        }
+
+        .required-note {
+            margin: 0 0 14px;
+            font-size: 13px;
+            color: var(--texto-suave);
+            text-align: left;
+        }
     </style>
 </head>
 <body>
@@ -72,24 +102,34 @@
         <form method="POST">
             <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(SessionManager::getCsrfToken()); ?>">
 
-            <label for="nome">Nome completo</label>
-            <input type="text" name="nome" id="nome" required>
+            <p class="required-note"><span class="required-mark">*</span> Campos obrigat&oacute;rios</p>
 
-            <label for="email">E-mail</label>
-            <input type="email" name="email" id="email" required>
+            <label for="nome">Nome completo <span class="required-mark">*</span></label>
+            <input type="text" name="nome" id="nome" value="<?php echo htmlspecialchars($_POST['nome'] ?? ''); ?>" required>
 
-            <label for="senha">Senha (mínimo 6 caracteres)</label>
+            <label for="email">E-mail <span class="required-mark">*</span></label>
+            <input type="email" name="email" id="email" value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>" required>
+
+            <label for="senha">Senha (m&iacute;nimo 6 caracteres) <span class="required-mark">*</span></label>
             <input type="password" name="senha" id="senha" required minlength="6">
+
+            <label for="confirmar_senha">Confirmar senha <span class="required-mark">*</span></label>
+            <input type="password" name="confirmar_senha" id="confirmar_senha" required minlength="6">
+
+            <div class="terms-group">
+                <input type="checkbox" name="aceita_termos" id="aceita_termos" value="1" <?php echo !empty($_POST['aceita_termos']) ? 'checked' : ''; ?> required>
+                <label for="aceita_termos">Concordo com os termos de uso <span class="required-mark">*</span></label>
+            </div>
 
             <button type="submit">Cadastrar</button>
         </form>
 
-        <p>Já tem conta? <a href="index.php?page=login">Faça login aqui</a></p>
+        <p>J&aacute; tem conta? <a href="index.php?page=login">Fa&ccedil;a login aqui</a></p>
     </section>
 </main>
 
 <footer>
-    <p>© 2026 ConectaSolidária</p>
+    <p>&copy; 2026 ConectaSolid&aacute;ria</p>
 </footer>
 
 </body>
