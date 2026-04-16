@@ -433,6 +433,15 @@ class DonationController {
 
         $pdf = new SimplePdf();
         $y = 790;
+        $logoPath = __DIR__ . '/../assets/uploas/logo.jpg';
+        if (!is_file($logoPath)) {
+            $logoPath = __DIR__ . '/../assets/uploas/logo.PNG';
+        }
+
+        $pdf->addStrokedRect(20, 20, 555, 802, 2.2, 25, 118, 210);
+        $pdf->addStrokedRect(30, 30, 535, 782, 1.0, 66, 133, 244);
+
+        $pdf->addImage($logoPath, 435, 760, 110, 52);
 
         $pdf->addLine('Comprovante de Entrega da Doação', 50, $y, 18, true);
         $qr = new QRCode($codigo, ['s' => 'qrh']);
@@ -496,6 +505,7 @@ class DonationController {
         $y = $pdf->addWrappedText('O coletor pode localizar a doação pelo código ou pelo QR Code abaixo.', 50, $y, 76, 11, false, 14);
 
         $pdf->addCenteredLine('QR Code para conferência rápida', $qrCenterX, $qrY + 18, 10, true);
+        $pdf->addCenteredLine('© 2026 ConectaSolidária', (int) floor(595 / 2), 24, 10);
 
         $pdf->output('comprovante-doacao-' . $codigo . '.pdf');
         exit;

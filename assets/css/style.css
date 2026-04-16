@@ -91,10 +91,10 @@ section{
 
 .site-header{
     background-color: var(--header-bg);
-    padding: 14px 28px;
+    padding: 10px 24px;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 10px;
     position: sticky;
     top: 0;
     z-index: 600;
@@ -118,8 +118,9 @@ section{
 }
 
 .logo{
-    width: clamp(150px, 24vw, 220px);
+    width: clamp(130px, 20vw, 180px);
     height: auto;
+    display: block;
     transition: transform 0.25s ease;
 }
 
@@ -1206,7 +1207,7 @@ footer{
     }
 
     .logo{
-        width: 170px;
+        width: 156px;
     }
 
     .banner{
