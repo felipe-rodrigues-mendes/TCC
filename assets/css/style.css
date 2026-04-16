@@ -982,6 +982,25 @@ footer{
     color: var(--link) !important;
 }
 
+/* CONTRASTE EXTRA PARA O PAINEL DO USUARIO */
+[data-theme="dark"] .painel-container .card-doacao h3,
+[data-theme="dark"] .painel-container .timeline-title,
+[data-theme="dark"] .painel-container .info-doacao strong{
+    color: #f8fafc !important;
+}
+
+[data-theme="dark"] .painel-container .info-doacao,
+[data-theme="dark"] .painel-container .itens-list li,
+[data-theme="dark"] .painel-container .rastreamento-desc,
+[data-theme="dark"] .painel-container .timeline-text,
+[data-theme="dark"] .painel-container .vazio{
+    color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .painel-container .timeline-item.current .timeline-title{
+    color: #fcd34d !important;
+}
+
 [data-theme="dark"] .campaign-info.is-closed,
 [data-theme="dark"] .status-badge.is-closed{
     color: var(--texto-suave) !important;
