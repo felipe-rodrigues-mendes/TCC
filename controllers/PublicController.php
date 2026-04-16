@@ -77,12 +77,12 @@ class PublicController {
         $campanhas = $this->campaignDAO->findAll();
 
         $imagensCampanhas = [
-            'Rio Grande do Sul' => 'assets/uploas/enchente Rio Grande do Sul.jpg',
-            'Bahia' => 'assets/uploas/enchente Bahia.jpg',
-            'Minas Gerais' => 'assets/uploas/Minas gerais.jpg',
-            'São Paulo' => 'assets/uploas/enchente Sao paulo.jpg',
-            'Santa Catarina' => 'assets/uploas/santa catarina.jpg',
-            'Paraná' => 'assets/uploas/Parána.jpg'
+            'Rio Grande do Sul' => 'assets/uploads/enchente Rio Grande do Sul.jpg',
+            'Bahia' => 'assets/uploads/enchente Bahia.jpg',
+            'Minas Gerais' => 'assets/uploads/Minas gerais.jpg',
+            'São Paulo' => 'assets/uploads/enchente Sao paulo.jpg',
+            'Santa Catarina' => 'assets/uploads/santa catarina.jpg',
+            'Paraná' => 'assets/uploads/Parána.jpg'
         ];
 
         foreach ($campanhas as &$campanha) {
