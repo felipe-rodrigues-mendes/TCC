@@ -27,13 +27,13 @@ $userName = SessionManager::getUserName();
     <div class="header-top">
         <div class="logo-container">
             <a href="index.php">
-         <img src="assets/uploads/logoo.png" class="logo" alt="Logo ConectaSolidária">
+         <img src="assets/uploads/logo.PNG" class="logo" alt="Logo ConectaSolidária">
 </a>
     </div>
 
         <div class="header-actions">
             <button type="button" id="themeToggle" class="theme-toggle" aria-pressed="false" aria-label="Alternar tema">
-                <i class="fas fa-moon" aria-hidden="true"></i>
+                <i class="fas fa-cog" aria-hidden="true"></i>
                 <span class="theme-toggle-label">Modo escuro</span>
             </button>
             <button type="button" id="menuToggle" class="menu-toggle" aria-expanded="false" aria-controls="mainNav" aria-label="Abrir menu">
@@ -89,13 +89,9 @@ $userName = SessionManager::getUserName();
             if (!themeToggle) {
                 return;
             }
-            const icon = themeToggle.querySelector('i');
             const label = themeToggle.querySelector('.theme-toggle-label');
             const isDark = root.getAttribute('data-theme') === 'dark';
             themeToggle.setAttribute('aria-pressed', isDark ? 'true' : 'false');
-            if (icon) {
-                icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
-            }
             if (label) {
                 label.textContent = isDark ? 'Modo claro' : 'Modo escuro';
             }
@@ -144,4 +140,3 @@ $userName = SessionManager::getUserName();
         }
     })();
 </script>
-

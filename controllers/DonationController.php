@@ -433,15 +433,45 @@ class DonationController {
 
         $pdf = new SimplePdf();
         $y = 790;
-        $logoPath = __DIR__ . '/../assets/uploas/logo.jpg';
-        if (!is_file($logoPath)) {
-            $logoPath = __DIR__ . '/../assets/uploas/logo.PNG';
-        }
+        $logoCandidates = [
+            __DIR__ . '/../assets/uploads/logo.jpg',
+            __DIR__ . '/../assets/uploads/logo.jpeg',
+            __DIR__ . '/../assets/uploads/logo.png',
+            __DIR__ . '/../assets/uploads/logo.PNG',
+        ];
+        $logoSlotX = 435;
+        $logoSlotY = 760;
+        $logoSlotWidth = 110;
+        $logoSlotHeight = 52;
 
         $pdf->addStrokedRect(20, 20, 555, 802, 2.2, 25, 118, 210);
         $pdf->addStrokedRect(30, 30, 535, 782, 1.0, 66, 133, 244);
 
-        $pdf->addImage($logoPath, 435, 760, 110, 52);
+        foreach ($logoCandidates as $logoPath) {
+            $logoDrawX = $logoSlotX;
+            $logoDrawY = $logoSlotY;
+            $logoDrawWidth = $logoSlotWidth;
+            $logoDrawHeight = $logoSlotHeight;
+
+            $logoInfo = @getimagesize($logoPath);
+            if ($logoInfo !== false && (int)($logoInfo[0] ?? 0) > 0 && (int)($logoInfo[1] ?? 0) > 0) {
+                $scale = min(
+                    $logoSlotWidth / (int)$logoInfo[0],
+                    $logoSlotHeight / (int)$logoInfo[1]
+                );
+
+                if ($scale > 0) {
+                    $logoDrawWidth = max(1, (int) floor((int)$logoInfo[0] * $scale));
+                    $logoDrawHeight = max(1, (int) floor((int)$logoInfo[1] * $scale));
+                    $logoDrawX = $logoSlotX + (int) floor(($logoSlotWidth - $logoDrawWidth) / 2);
+                    $logoDrawY = $logoSlotY + (int) floor(($logoSlotHeight - $logoDrawHeight) / 2);
+                }
+            }
+
+            if ($pdf->addImage($logoPath, $logoDrawX, $logoDrawY, $logoDrawWidth, $logoDrawHeight)) {
+                break;
+            }
+        }
 
         $pdf->addLine('Comprovante de Entrega da Doação', 50, $y, 18, true);
         $qr = new QRCode($codigo, ['s' => 'qrh']);
