@@ -596,6 +596,10 @@ section{
 .donate-process .step-card{
     position: relative;
     overflow: hidden;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    flex: 1 1 0;
 }
 
 .donate-process .step-card::before{
@@ -611,6 +615,11 @@ section{
 .donate-process .step-card > *{
     position: relative;
     z-index: 1;
+}
+
+.donate-process .step-card h3,
+.donate-process .step-card p{
+    overflow-wrap: anywhere;
 }
 
 .step-card:hover{
@@ -1295,6 +1304,11 @@ footer{
 
     .donate-process .step-card::before{
         background-size: 110px;
+    }
+
+    .donate-process .step-card{
+        min-width: min(100%, 340px);
+        flex: 0 0 min(100%, 340px);
     }
 
     .donate-header{
