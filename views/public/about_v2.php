@@ -24,7 +24,7 @@
             min-height: 430px;
             background:
                 linear-gradient(120deg, rgba(15, 23, 42, 0.78), rgba(37, 99, 235, 0.55)),
-                url('assets/uploas/enchente Rio Grande do Sul.jpg') center/cover;
+                url('assets/uploads/enchente Rio Grande do Sul.jpg') center/cover;
             box-shadow: 0 12px 28px rgba(15, 23, 42, 0.18);
             display: flex;
             align-items: flex-end;
@@ -197,6 +197,23 @@
             border: 1px solid #dbeafe;
             border-radius: 18px;
             padding: 22px 18px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .step-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: url('assets/uploads/logo.PNG') center/120px no-repeat;
+            opacity: 0.08;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .step-card > * {
+            position: relative;
+            z-index: 1;
         }
 
         .step-number {
@@ -227,7 +244,7 @@
         .cta-card {
             background:
                 linear-gradient(135deg, rgba(37, 99, 235, 0.96), rgba(30, 58, 138, 0.94)),
-                url('assets/uploas/enchente Bahia.jpg') center/cover;
+                url('assets/uploads/enchente Bahia.jpg') center/cover;
             color: white;
             position: relative;
             overflow: hidden;
@@ -297,6 +314,10 @@
 
             .gallery-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .step-card::before {
+                background-size: 90px;
             }
         }
     </style>
@@ -373,10 +394,10 @@
                 <p>As campanhas atendidas pelo sistema representam realidades que exigem mobilização rápida, cuidado coletivo e logística humanitária eficiente.</p>
 
                 <div class="gallery-grid">
-                    <img src="assets/uploas/enchente Bahia.jpg" alt="Ações de solidariedade e apoio humanitário na Bahia">
-                    <img src="assets/uploas/Minas gerais.jpg" alt="Comunidades afetadas recebendo apoio em Minas Gerais">
-                    <img src="assets/uploas/enchente Sao paulo.jpg" alt="Mobilização social de ajuda em São Paulo">
-                    <img src="assets/uploas/santa catarina.jpg" alt="Apoio emergencial e rede de solidariedade em Santa Catarina">
+                    <img src="assets/uploads/enchente Bahia.jpg" alt="Ações de solidariedade e apoio humanitário na Bahia">
+                    <img src="assets/uploads/Minas gerais.jpg" alt="Comunidades afetadas recebendo apoio em Minas Gerais">
+                    <img src="assets/uploads/enchente Sao paulo.jpg" alt="Mobilização social de ajuda em São Paulo">
+                    <img src="assets/uploads/santa catarina.jpg" alt="Apoio emergencial e rede de solidariedade em Santa Catarina">
                 </div>
             </aside>
         </section>
