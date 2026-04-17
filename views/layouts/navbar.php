@@ -27,8 +27,8 @@ $userName = SessionManager::getUserName();
     <div class="header-top">
         <div class="logo-container">
             <a href="index.php">
-            <img src="assets/uploas/logo.PNG" class="logo" alt="Logo ConectaSolid&aacute;ria">
-            </a>
+         <img src="assets/uploads/logoo.png" class="logo" alt="Logo ConectaSolidária">
+</a>
     </div>
 
         <div class="header-actions">
