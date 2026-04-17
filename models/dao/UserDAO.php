@@ -185,15 +185,33 @@ class UserDAO {
      * @param string $nome
      * @param string $email
      * @param string $senha
+     * @param bool $aceitaTermos
+     * @param string $termosVersao
      * @return int|null ID do usuário criado ou null se falhar
      */
-    public function register(string $nome, string $email, string $senha): ?int {
+    public function register(
+        string $nome,
+        string $email,
+        string $senha,
+        bool $aceitaTermos = false,
+        string $termosVersao = 'v1.0'
+    ): ?int {
         $nome = trim($nome);
         $email = trim($email);
+        $termosVersao = trim($termosVersao);
 
         if (empty($nome) || empty($email) || empty($senha)) {
             error_log('Dados incompletos para registro de usuário');
             return null;
+        }
+
+        if (!$aceitaTermos) {
+            error_log('Tentativa de registro sem aceite de termos LGPD');
+            return null;
+        }
+
+        if ($termosVersao === '') {
+            $termosVersao = 'v1.0';
         }
 
         if ($this->exists($email)) {
@@ -215,14 +233,36 @@ class UserDAO {
         try {
             Database::getInstance()->beginTransaction();
 
-            $sqlUsuario = 'INSERT INTO usuario (nome, email, telefone, ativo, id_perfil) VALUES (?, ?, ?, 1, ?)';
+            $sqlUsuario = '
+                INSERT INTO usuario (
+                    nome,
+                    email,
+                    telefone,
+                    ativo,
+                    id_perfil,
+                    aceite_termos_lgpd,
+                    aceite_termos_data,
+                    aceite_termos_versao
+                )
+                VALUES (?, ?, ?, 1, ?, ?, IF(? = 1, NOW(), NULL), ?)
+            ';
             $stmtUsuario = $this->conn->prepare($sqlUsuario);
             if (!$stmtUsuario) {
                 throw new Exception('Erro ao preparar registro de usuário: ' . $this->conn->error);
             }
 
             $telefone = '';
-            $stmtUsuario->bind_param('sssi', $nome, $email, $telefone, $perfilId);
+            $aceiteTermosInt = $aceitaTermos ? 1 : 0;
+            $stmtUsuario->bind_param(
+                'sssiiis',
+                $nome,
+                $email,
+                $telefone,
+                $perfilId,
+                $aceiteTermosInt,
+                $aceiteTermosInt,
+                $termosVersao
+            );
 
             if (!$stmtUsuario->execute()) {
                 throw new Exception('Erro ao executar registro de usuário: ' . $stmtUsuario->error);
@@ -492,6 +532,3 @@ class UserDAO {
         return $afetados >= 0;
     }
 }
-
-
-

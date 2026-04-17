@@ -22,10 +22,64 @@ CREATE TABLE IF NOT EXISTS usuario (
   telefone VARCHAR(20) DEFAULT NULL,
   ativo TINYINT(1) NOT NULL DEFAULT 1,
   id_perfil INT NOT NULL,
+  aceite_termos_lgpd TINYINT(1) NOT NULL DEFAULT 0,
+  aceite_termos_data DATETIME NULL,
+  aceite_termos_versao VARCHAR(20) DEFAULT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_usuario_perfil
     FOREIGN KEY (id_perfil) REFERENCES perfil(id_perfil)
 ) ENGINE=InnoDB;
+
+SET @sql_add_aceite_termos_lgpd = (
+  SELECT IF(
+    EXISTS (
+      SELECT 1
+      FROM information_schema.COLUMNS
+      WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = 'usuario'
+        AND COLUMN_NAME = 'aceite_termos_lgpd'
+    ),
+    'SELECT 1',
+    'ALTER TABLE usuario ADD COLUMN aceite_termos_lgpd TINYINT(1) NOT NULL DEFAULT 0 AFTER id_perfil'
+  )
+);
+PREPARE stmt_add_aceite_termos_lgpd FROM @sql_add_aceite_termos_lgpd;
+EXECUTE stmt_add_aceite_termos_lgpd;
+DEALLOCATE PREPARE stmt_add_aceite_termos_lgpd;
+
+SET @sql_add_aceite_termos_data = (
+  SELECT IF(
+    EXISTS (
+      SELECT 1
+      FROM information_schema.COLUMNS
+      WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = 'usuario'
+        AND COLUMN_NAME = 'aceite_termos_data'
+    ),
+    'SELECT 1',
+    'ALTER TABLE usuario ADD COLUMN aceite_termos_data DATETIME NULL AFTER aceite_termos_lgpd'
+  )
+);
+PREPARE stmt_add_aceite_termos_data FROM @sql_add_aceite_termos_data;
+EXECUTE stmt_add_aceite_termos_data;
+DEALLOCATE PREPARE stmt_add_aceite_termos_data;
+
+SET @sql_add_aceite_termos_versao = (
+  SELECT IF(
+    EXISTS (
+      SELECT 1
+      FROM information_schema.COLUMNS
+      WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = 'usuario'
+        AND COLUMN_NAME = 'aceite_termos_versao'
+    ),
+    'SELECT 1',
+    'ALTER TABLE usuario ADD COLUMN aceite_termos_versao VARCHAR(20) DEFAULT NULL AFTER aceite_termos_data'
+  )
+);
+PREPARE stmt_add_aceite_termos_versao FROM @sql_add_aceite_termos_versao;
+EXECUTE stmt_add_aceite_termos_versao;
+DEALLOCATE PREPARE stmt_add_aceite_termos_versao;
 
 CREATE TABLE IF NOT EXISTS login (
   id_login INT AUTO_INCREMENT PRIMARY KEY,
@@ -368,8 +422,8 @@ WHERE e.logradouro = 'Escola Classe Vila Esperança'
   )
 LIMIT 1;
 
-INSERT INTO usuario (nome, email, telefone, ativo, id_perfil)
-SELECT 'Administrador', 'admin@conectasolidaria.local', '', 1, p.id_perfil
+INSERT INTO usuario (nome, email, telefone, ativo, id_perfil, aceite_termos_lgpd, aceite_termos_data, aceite_termos_versao)
+SELECT 'Administrador', 'admin@conectasolidaria.local', '', 1, p.id_perfil, 1, NOW(), 'v1.0'
 FROM perfil p
 WHERE p.nome = 'admin'
   AND NOT EXISTS (

@@ -83,6 +83,72 @@
             color: var(--texto-suave);
             text-align: left;
         }
+
+        .terms-box {
+            margin: 8px 0 12px;
+            padding: 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 12px;
+            background: #f8fafc;
+        }
+
+        .terms-title {
+            margin: 0 0 8px;
+            font-size: 15px;
+            color: var(--preto);
+        }
+
+        .terms-text {
+            margin: 0 0 8px;
+            font-size: 13px;
+            color: var(--texto-suave);
+            text-align: left;
+            line-height: 1.45;
+        }
+
+        .terms-list {
+            margin: 0 0 10px 18px;
+            padding: 0;
+            color: var(--texto-suave);
+            font-size: 13px;
+            line-height: 1.45;
+        }
+
+        .terms-version {
+            margin: 0;
+            font-size: 12px;
+            color: #64748b;
+            text-align: left;
+        }
+
+        [data-theme="dark"] .form-section label {
+            color: var(--texto);
+        }
+
+        [data-theme="dark"] .form-section .required-note {
+            color: var(--texto-suave);
+        }
+
+        [data-theme="dark"] .terms-box {
+            background: var(--bg-surface-soft);
+            border-color: var(--border-strong);
+        }
+
+        [data-theme="dark"] .terms-title {
+            color: var(--texto);
+        }
+
+        [data-theme="dark"] .terms-text,
+        [data-theme="dark"] .terms-list,
+        [data-theme="dark"] .terms-version {
+            color: var(--texto-suave);
+        }
+
+        [data-theme="dark"] .mensagem {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: #fecaca;
+            border-color: rgba(252, 165, 165, 0.4);
+        }
     </style>
 </head>
 <body>
@@ -116,9 +182,26 @@
             <label for="confirmar_senha">Confirmar senha <span class="required-mark">*</span></label>
             <input type="password" name="confirmar_senha" id="confirmar_senha" required minlength="6">
 
+            <div class="terms-box" id="termos-lgpd" role="note" aria-label="Termos de uso e politica de privacidade">
+                <h3 class="terms-title">Termos de Uso e Pol&iacute;tica de Privacidade (LGPD)</h3>
+                <p class="terms-text">
+                    Para criar sua conta, precisamos tratar seus dados pessoais para autentica&ccedil;&atilde;o,
+                    seguran&ccedil;a do acesso e opera&ccedil;&atilde;o das doa&ccedil;&otilde;es na plataforma.
+                </p>
+                <ul class="terms-list">
+                    <li>Dados coletados no cadastro: nome, e-mail e credenciais de acesso.</li>
+                    <li>Uso dos dados: identifica&ccedil;&atilde;o do doador, gest&atilde;o de conta e preven&ccedil;&atilde;o de fraude.</li>
+                    <li>Seus direitos (LGPD): confirma&ccedil;&atilde;o, acesso, corre&ccedil;&atilde;o e exclus&atilde;o, conforme legisla&ccedil;&atilde;o aplic&aacute;vel.</li>
+                </ul>
+                <p class="terms-version">Vers&atilde;o dos termos: v1.0</p>
+            </div>
+
             <div class="terms-group">
                 <input type="checkbox" name="aceita_termos" id="aceita_termos" value="1" <?php echo !empty($_POST['aceita_termos']) ? 'checked' : ''; ?> required>
-                <label for="aceita_termos">Concordo com os termos de uso <span class="required-mark">*</span></label>
+                <label for="aceita_termos">
+                    Declaro que li e concordo com os Termos de Uso e com a Pol&iacute;tica de Privacidade, nos termos da LGPD
+                    (Lei n&ordm; 13.709/2018) <span class="required-mark">*</span>
+                </label>
             </div>
 
             <button type="submit">Cadastrar</button>

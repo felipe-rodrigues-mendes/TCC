@@ -81,6 +81,7 @@ class AuthController {
     public function register(): void {
         $mensagem = '';
         $redirect = trim((string)($_GET['redirect'] ?? ''));
+        $termosVersao = 'v1.0';
 
         if (str_starts_with($redirect, 'index.php')) {
             $_SESSION['redirect_to'] = $redirect;
@@ -108,7 +109,7 @@ class AuthController {
             } elseif (!$aceitaTermos) {
                 $mensagem = 'Você precisa concordar com os termos de uso para continuar.';
             } else {
-                $usuarioId = $this->userDAO->register($nome, $email, $senha);
+                $usuarioId = $this->userDAO->register($nome, $email, $senha, $aceitaTermos, $termosVersao);
 
                 if ($usuarioId !== null) {
                     header('Location: index.php?page=login&cadastro=sucesso');
@@ -171,5 +172,3 @@ class AuthController {
         exit;
     }
 }
-
-
