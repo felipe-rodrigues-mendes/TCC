@@ -34,7 +34,7 @@ $userName = SessionManager::getUserName();
         <div class="header-actions">
             <button type="button" id="themeToggle" class="theme-toggle" aria-pressed="false" aria-label="Alternar tema">
                 <i class="fas fa-moon" aria-hidden="true"></i>
-                <span class="theme-toggle-label">Dark mode</span>
+                <span class="theme-toggle-label">Modo escuro</span>
             </button>
             <button type="button" id="menuToggle" class="menu-toggle" aria-expanded="false" aria-controls="mainNav" aria-label="Abrir menu">
                 <i class="fas fa-bars" aria-hidden="true"></i>
@@ -97,7 +97,7 @@ $userName = SessionManager::getUserName();
                 icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
             }
             if (label) {
-                label.textContent = isDark ? 'Modo claro' : 'Dark mode';
+                label.textContent = isDark ? 'Modo claro' : 'Modo escuro';
             }
         };
 
