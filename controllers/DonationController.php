@@ -434,15 +434,13 @@ class DonationController {
         $pdf = new SimplePdf();
         $y = 790;
         $logoCandidates = [
-            __DIR__ . '/../assets/uploads/logo.jpg',
-            __DIR__ . '/../assets/uploads/logo.jpeg',
-            __DIR__ . '/../assets/uploads/logo.png',
-            __DIR__ . '/../assets/uploads/logo.PNG',
+            __DIR__ . '/../assets/uploads/logo_sem_fundo_final.png',
+            __DIR__ . '/../assets/uploads/logo_sem_fundo_final.jpg',
         ];
-        $logoSlotX = 435;
-        $logoSlotY = 760;
-        $logoSlotWidth = 110;
-        $logoSlotHeight = 52;
+        $logoSlotX = 380;
+        $logoSlotY = 728;
+        $logoSlotWidth = 175;
+        $logoSlotHeight = 84;
 
         $pdf->addStrokedRect(20, 20, 555, 802, 2.2, 25, 118, 210);
         $pdf->addStrokedRect(30, 30, 535, 782, 1.0, 66, 133, 244);

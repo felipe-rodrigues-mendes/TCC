@@ -86,6 +86,23 @@
             padding: 24px;
             border: 1px solid #dbeafe;
             box-shadow: 0 8px 20px rgba(37, 99, 235, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .impact-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: url('assets/uploads/logo.PNG') center/110px no-repeat;
+            opacity: 0.09;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .impact-card > * {
+            position: relative;
+            z-index: 1;
         }
 
         .impact-card i {
@@ -197,6 +214,10 @@
             border: 1px solid #dbeafe;
             border-radius: 18px;
             padding: 22px 18px;
+            width: 100%;
+            min-width: 0;
+            min-height: 0;
+            flex: 1 1 auto;
             position: relative;
             overflow: hidden;
         }
@@ -239,6 +260,7 @@
             margin: 0;
             font-size: 14px;
             line-height: 1.65;
+            overflow-wrap: anywhere;
         }
 
         .cta-card {
@@ -314,6 +336,10 @@
 
             .gallery-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .impact-card::before {
+                background-size: 90px;
             }
 
             .step-card::before {
