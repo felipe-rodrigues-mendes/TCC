@@ -39,7 +39,7 @@ SessionManager::requireRole('admin');
         }
 
         .helper {
-            color: #6b7280;
+            color: var(--texto-suave);
             font-size: 14px;
             margin-bottom: 16px;
         }
@@ -101,15 +101,70 @@ SessionManager::requireRole('admin');
         }
 
         .muted {
-            color: #6b7280;
+            color: var(--texto-suave);
             font-size: 13px;
             margin-bottom: 8px;
         }
 
-        .new-destination {
+        .destination-select-note {
             margin-top: 14px;
             padding-top: 14px;
             border-top: 1px dashed #cbd5e1;
+        }
+
+        .institution-list {
+            display: grid;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .institution-item {
+            border: 1px solid var(--cinza-borda);
+            border-radius: 12px;
+            padding: 12px;
+            background: var(--bg-surface-muted);
+        }
+
+        .institution-item strong {
+            color: var(--texto);
+        }
+
+        .institution-item-top {
+            display: flex;
+            gap: 12px;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .danger-button {
+            background: #dc2626;
+            color: #fff;
+        }
+
+        .danger-button:hover {
+            background: #b91c1c;
+        }
+
+        .activate-button {
+            background: #15803d;
+            color: #fff;
+        }
+
+        .activate-button:hover {
+            background: #166534;
+        }
+
+        .status-badge.ativo {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+
+        .status-badge.inativo {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
         }
 
         .history-list {
@@ -223,9 +278,9 @@ SessionManager::requireRole('admin');
                     <?php endforeach; ?>
                 </select>
 
-                <label for="destino_id">Destino existente</label>
-                <select name="destino_id" id="destino_id">
-                    <option value="">-- Selecionar destino cadastrado --</option>
+                <label for="destino_id">Instituicao cadastrada</label>
+                <select name="destino_id" id="destino_id" required>
+                    <option value="">-- Selecionar instituicao cadastrada --</option>
                     <?php foreach ($destinos as $destino): ?>
                         <option value="<?php echo (int)$destino['id']; ?>">
                             <?php echo htmlspecialchars($destino['label']); ?>
@@ -233,15 +288,8 @@ SessionManager::requireRole('admin');
                     <?php endforeach; ?>
                 </select>
 
-                <div class="new-destination">
-                    <h3>Novo Destino</h3>
-                    <p class="helper">Use estes campos somente se o destino ainda não existir.</p>
-
-                    <input type="text" name="novo_destino_nome" placeholder="Nome do destino">
-                    <input type="text" name="novo_destino_logradouro" placeholder="Logradouro">
-                    <input type="text" name="novo_destino_cidade" placeholder="Cidade">
-                    <input type="text" name="novo_destino_estado" placeholder="Estado">
-                    <input type="text" name="novo_destino_cep" placeholder="CEP">
+                <div class="destination-select-note">
+                    <p class="helper">Use somente instituicoes cadastradas. Se precisar de uma nova, cadastre no painel abaixo.</p>
                 </div>
 
                 <label for="data_envio">Data de envio</label>
@@ -254,6 +302,70 @@ SessionManager::requireRole('admin');
 
                 <button type="submit">Registrar Distribuição</button>
             </form>
+        </section>
+
+        <section class="panel-card">
+            <h2>Instituicoes de caridade</h2>
+            <p class="helper">Cadastre novas instituicoes para entrega e use ativar/desativar para controlar a disponibilidade sem excluir historico.</p>
+
+            <form method="POST" action="index.php?page=admin_distributions">
+                <input type="hidden" name="cadastrar_destino" value="1">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(SessionManager::getCsrfToken()); ?>">
+
+                <label for="novo_destino_nome">Nome da instituicao</label>
+                <input type="text" name="novo_destino_nome" id="novo_destino_nome" placeholder="Nome da instituicao" required>
+
+                <label for="novo_destino_logradouro">Logradouro</label>
+                <input type="text" name="novo_destino_logradouro" id="novo_destino_logradouro" placeholder="Logradouro" required>
+
+                <label for="novo_destino_cidade">Cidade</label>
+                <input type="text" name="novo_destino_cidade" id="novo_destino_cidade" placeholder="Cidade" required>
+
+                <label for="novo_destino_estado">Estado</label>
+                <input type="text" name="novo_destino_estado" id="novo_destino_estado" placeholder="UF" maxlength="2" required>
+
+                <label for="novo_destino_cep">CEP</label>
+                <input type="text" name="novo_destino_cep" id="novo_destino_cep" placeholder="CEP" required>
+
+                <button type="submit">Cadastrar instituicao</button>
+            </form>
+
+            <h3>Instituicoes cadastradas</h3>
+            <?php if (empty($instituicoes)): ?>
+                <p class="helper">Nenhuma instituicao cadastrada no momento.</p>
+            <?php else: ?>
+                <div class="institution-list">
+                    <?php foreach ($instituicoes as $instituicao): ?>
+                        <?php $instituicaoAtiva = ((int)($instituicao['ativo'] ?? 1)) === 1; ?>
+                        <article class="institution-item">
+                            <div class="institution-item-top">
+                                <div>
+                                    <strong><?php echo htmlspecialchars($instituicao['nome']); ?></strong>
+                                    <div class="muted">
+                                        Status:
+                                        <span class="status-badge <?php echo $instituicaoAtiva ? 'ativo' : 'inativo'; ?>">
+                                            <?php echo $instituicaoAtiva ? 'ATIVA' : 'INATIVA'; ?>
+                                        </span>
+                                    </div>
+                                    <div class="muted">
+                                        <?php echo htmlspecialchars($instituicao['logradouro'] . ' - ' . $instituicao['cidade'] . '/' . $instituicao['estado']); ?>
+                                    </div>
+                                    <div class="muted">CEP: <?php echo htmlspecialchars($instituicao['cep']); ?></div>
+                                </div>
+                                <form method="POST" action="index.php?page=admin_distributions" class="inline-form" onsubmit="return confirm('<?php echo $instituicaoAtiva ? 'Desativar esta instituicao para impedir novas distribuicoes?' : 'Ativar esta instituicao para permitir novas distribuicoes?'; ?>');">
+                                    <input type="hidden" name="alterar_status_destino" value="1">
+                                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(SessionManager::getCsrfToken()); ?>">
+                                    <input type="hidden" name="destino_id" value="<?php echo (int)$instituicao['id']; ?>">
+                                    <input type="hidden" name="novo_status" value="<?php echo $instituicaoAtiva ? 'desativar' : 'ativar'; ?>">
+                                    <button type="submit" class="<?php echo $instituicaoAtiva ? 'danger-button' : 'activate-button'; ?>">
+                                        <?php echo $instituicaoAtiva ? 'Desativar instituicao' : 'Ativar instituicao'; ?>
+                                    </button>
+                                </form>
+                            </div>
+                        </article>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
         </section>
 
         <section class="panel-card">
