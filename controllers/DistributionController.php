@@ -9,7 +9,7 @@ require_once __DIR__ . '/../models/Database.php';
 require_once __DIR__ . '/SessionManager.php';
 
 /**
- * Controller para gerenciar distribuições administrativas.
+ * Controller para gerenciar distribuicoes administrativas.
  */
 class DistributionController {
     private $distributionDAO;
@@ -40,7 +40,7 @@ class DistributionController {
 
         $normalized = strtolower($normalized);
 
-        // Remove separadores e artefatos de transliteracao para comparações estáveis.
+        // Remove separadores para comparacoes estaveis.
         return preg_replace('/[^a-z0-9]+/', '', $normalized) ?? '';
     }
 
@@ -67,10 +67,34 @@ class DistributionController {
         }));
     }
 
+    private function redirectWithMessage(string $mensagem, string $tipo = 'erro'): void {
+        SessionManager::setMessage($mensagem, $tipo);
+        header('Location: index.php?page=admin_distributions');
+        exit;
+    }
+
+    private function validateCsrfOrRedirect(): void {
+        if (SessionManager::validateCsrfToken($_POST['csrf_token'] ?? null)) {
+            return;
+        }
+
+        $this->redirectWithMessage('Sua sessao expirou. Atualize a pagina e tente novamente.');
+    }
+
     public function manage(): void {
         $this->requireAdmin();
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (isset($_POST['cadastrar_destino'])) {
+                $this->createDestination();
+                return;
+            }
+
+            if (isset($_POST['alterar_status_destino']) || isset($_POST['excluir_destino'])) {
+                $this->updateDestinationStatus();
+                return;
+            }
+
             if (isset($_POST['registrar_distribuicao'])) {
                 $this->store();
                 return;
@@ -87,7 +111,8 @@ class DistributionController {
         $tipoMensagem = $flash['tipo'] ?? '';
         $pontos = $this->getAllowedStockPoints();
         $campanhas = $this->campaignDAO->findAllActive();
-        $destinos = $this->destinationDAO->findAll();
+        $destinos = $this->destinationDAO->findAll(true);
+        $instituicoes = $this->destinationDAO->findAll(false);
         $distribuicoes = $this->distributionDAO->findAll();
         $estoquePorPonto = [];
 
@@ -98,66 +123,140 @@ class DistributionController {
         include __DIR__ . '/../views/admin/distributions.php';
     }
 
+    public function createDestination(): void {
+        $this->requireAdmin();
+        $this->validateCsrfOrRedirect();
+
+        $nome = trim((string)($_POST['novo_destino_nome'] ?? ''));
+        $logradouro = trim((string)($_POST['novo_destino_logradouro'] ?? ''));
+        $cidade = trim((string)($_POST['novo_destino_cidade'] ?? ''));
+        $estado = strtoupper(trim((string)($_POST['novo_destino_estado'] ?? '')));
+        $cep = trim((string)($_POST['novo_destino_cep'] ?? ''));
+
+        if ($nome === '' || $logradouro === '' || $cidade === '' || $estado === '' || $cep === '') {
+            $this->redirectWithMessage('Preencha todos os campos para cadastrar a instituicao de caridade.');
+        }
+
+        $destinoExistente = $this->destinationDAO->findByIdentity($nome, $logradouro, $cidade, $estado, $cep);
+        if ($destinoExistente !== null) {
+            $destinoExistenteId = (int)($destinoExistente['id'] ?? 0);
+            $destinoExistenteAtivo = ((int)($destinoExistente['ativo'] ?? 1)) === 1;
+
+            if ($destinoExistenteAtivo) {
+                $this->redirectWithMessage('Essa instituicao ja esta cadastrada como destino ativo.');
+            }
+
+            if ($destinoExistenteId <= 0) {
+                $this->redirectWithMessage('Nao foi possivel reativar a instituicao informada.');
+            }
+
+            if (!$this->destinationDAO->activate($destinoExistenteId)) {
+                $this->redirectWithMessage('Nao foi possivel reativar a instituicao informada.');
+            }
+
+            $this->redirectWithMessage('Instituicao reativada e liberada para novas distribuicoes.', 'sucesso');
+        }
+
+        try {
+            Database::getInstance()->beginTransaction();
+
+            $destinoId = $this->destinationDAO->create($nome, $logradouro, $cidade, $estado, $cep);
+            if ($destinoId === null) {
+                throw new Exception('Nao foi possivel cadastrar a instituicao informada.');
+            }
+
+            Database::getInstance()->commit();
+            $this->redirectWithMessage('Instituicao de caridade cadastrada com sucesso.', 'sucesso');
+        } catch (Exception $e) {
+            Database::getInstance()->rollback();
+            $this->redirectWithMessage('Erro ao cadastrar instituicao: ' . $e->getMessage());
+        }
+    }
+
+    public function updateDestinationStatus(): void {
+        $this->requireAdmin();
+        $this->validateCsrfOrRedirect();
+
+        $destinoId = (int)($_POST['destino_id'] ?? 0);
+        if ($destinoId <= 0) {
+            $this->redirectWithMessage('Instituicao invalida.');
+        }
+
+        $novoStatus = strtolower(trim((string)($_POST['novo_status'] ?? '')));
+        if ($novoStatus === '' && isset($_POST['excluir_destino'])) {
+            // Compatibilidade com o nome antigo do formulario.
+            $novoStatus = 'desativar';
+        }
+
+        if (!in_array($novoStatus, ['ativar', 'desativar'], true)) {
+            $this->redirectWithMessage('Acao de status invalida para a instituicao.');
+        }
+
+        $destino = $this->destinationDAO->findById($destinoId);
+        if ($destino === null) {
+            $this->redirectWithMessage('Instituicao nao encontrada.');
+        }
+
+        $estaAtivo = ((int)($destino['ativo'] ?? 1)) === 1;
+
+        if ($novoStatus === 'ativar') {
+            if ($estaAtivo) {
+                $this->redirectWithMessage('A instituicao ja esta ativa.', 'sucesso');
+            }
+
+            if (!$this->destinationDAO->activate($destinoId)) {
+                $this->redirectWithMessage('Nao foi possivel ativar a instituicao selecionada.');
+            }
+
+            $this->redirectWithMessage('Instituicao ativada com sucesso.', 'sucesso');
+        }
+
+        if (!$estaAtivo) {
+            $this->redirectWithMessage('A instituicao ja esta inativa.', 'sucesso');
+        }
+
+        if (!$this->destinationDAO->deactivate($destinoId)) {
+            $this->redirectWithMessage('Nao foi possivel desativar a instituicao selecionada.');
+        }
+
+        $this->redirectWithMessage('Instituicao desativada com sucesso.', 'sucesso');
+    }
+
     public function store(): void {
         $this->requireAdmin();
-
-        if (!SessionManager::validateCsrfToken($_POST['csrf_token'] ?? null)) {
-            SessionManager::setMessage('Sua sessão expirou. Atualize a página e tente novamente.', 'erro');
-            header('Location: index.php?page=admin_distributions');
-            exit;
-        }
+        $this->validateCsrfOrRedirect();
 
         $pontoId = (int)($_POST['ponto_id'] ?? 0);
         $campanhaId = (int)($_POST['campanha_id'] ?? 0);
-        $destinoExistenteId = (int)($_POST['destino_id'] ?? 0);
-        $novoDestinoNome = trim((string)($_POST['novo_destino_nome'] ?? ''));
-        $novoDestinoLogradouro = trim((string)($_POST['novo_destino_logradouro'] ?? ''));
-        $novoDestinoCidade = trim((string)($_POST['novo_destino_cidade'] ?? ''));
-        $novoDestinoEstado = trim((string)($_POST['novo_destino_estado'] ?? ''));
-        $novoDestinoCep = trim((string)($_POST['novo_destino_cep'] ?? ''));
+        $destinoId = (int)($_POST['destino_id'] ?? 0);
         $dataEnvio = trim((string)($_POST['data_envio'] ?? date('Y-m-d')));
         $itensSelecionados = isset($_POST['itens']) ? (array)$_POST['itens'] : [];
         $quantidades = isset($_POST['quantidades']) ? (array)$_POST['quantidades'] : [];
 
         if ($pontoId <= 0) {
-            SessionManager::setMessage('Selecione um ponto de estoque para distribuir os itens.', 'erro');
-            header('Location: index.php?page=admin_distributions');
-            exit;
+            $this->redirectWithMessage('Selecione um ponto de estoque para distribuir os itens.');
         }
 
         $allowedPontos = $this->getAllowedStockPoints();
         $allowedPointIds = array_map('intval', array_column($allowedPontos, 'id'));
         if (!in_array($pontoId, $allowedPointIds, true)) {
-            SessionManager::setMessage('O ponto de estoque selecionado não está disponível para distribuição.', 'erro');
-            header('Location: index.php?page=admin_distributions');
-            exit;
+            $this->redirectWithMessage('O ponto de estoque selecionado nao esta disponivel para distribuicao.');
         }
 
         if ($campanhaId <= 0) {
-            SessionManager::setMessage('Selecione a campanha/cidade dessa distribuição.', 'erro');
-            header('Location: index.php?page=admin_distributions');
-            exit;
+            $this->redirectWithMessage('Selecione a campanha/cidade dessa distribuicao.');
+        }
+
+        if ($destinoId <= 0) {
+            $this->redirectWithMessage('Selecione a instituicao de caridade cadastrada para a entrega.');
+        }
+
+        if (!$this->destinationDAO->existsActive($destinoId)) {
+            $this->redirectWithMessage('A instituicao selecionada nao esta disponivel para novas entregas.');
         }
 
         if (empty($itensSelecionados)) {
-            SessionManager::setMessage('Selecione ao menos um item para distribuição.', 'erro');
-            header('Location: index.php?page=admin_distributions');
-            exit;
-        }
-
-        $destinoId = $destinoExistenteId;
-        $criandoNovoDestino = $destinoId <= 0 && $novoDestinoNome !== '';
-
-        if ($destinoId <= 0 && !$criandoNovoDestino) {
-            SessionManager::setMessage('Selecione um destino existente ou cadastre um novo destino.', 'erro');
-            header('Location: index.php?page=admin_distributions');
-            exit;
-        }
-
-        if ($criandoNovoDestino && ($novoDestinoLogradouro === '' || $novoDestinoCidade === '' || $novoDestinoEstado === '' || $novoDestinoCep === '')) {
-            SessionManager::setMessage('Preencha todos os campos do novo destino para continuar.', 'erro');
-            header('Location: index.php?page=admin_distributions');
-            exit;
+            $this->redirectWithMessage('Selecione ao menos um item para distribuicao.');
         }
 
         $estoqueDisponivel = [];
@@ -174,21 +273,15 @@ class DistributionController {
             $quantidade = isset($quantidades[$categoriaId]) ? (int)$quantidades[$categoriaId] : 0;
 
             if ($categoriaId <= 0 || $quantidade <= 0) {
-                SessionManager::setMessage('Informe quantidades válidas para cada item selecionado.', 'erro');
-                header('Location: index.php?page=admin_distributions');
-                exit;
+                $this->redirectWithMessage('Informe quantidades validas para cada item selecionado.');
             }
 
             if (!isset($estoqueDisponivel[$categoriaId])) {
-                SessionManager::setMessage('Um dos itens selecionados não existe no estoque do ponto informado.', 'erro');
-                header('Location: index.php?page=admin_distributions');
-                exit;
+                $this->redirectWithMessage('Um dos itens selecionados nao existe no estoque do ponto informado.');
             }
 
             if ($quantidade > $estoqueDisponivel[$categoriaId]['quantidade']) {
-                SessionManager::setMessage('A quantidade solicitada excede o estoque disponível para um dos itens.', 'erro');
-                header('Location: index.php?page=admin_distributions');
-                exit;
+                $this->redirectWithMessage('A quantidade solicitada excede o estoque disponivel para um dos itens.');
             }
 
             $itens[$categoriaId] = $quantidade;
@@ -197,20 +290,6 @@ class DistributionController {
         try {
             Database::getInstance()->beginTransaction();
 
-            if ($criandoNovoDestino) {
-                $destinoId = $this->destinationDAO->create(
-                    $novoDestinoNome,
-                    $novoDestinoLogradouro,
-                    $novoDestinoCidade,
-                    $novoDestinoEstado,
-                    $novoDestinoCep
-                );
-
-                if ($destinoId === null) {
-                    throw new Exception('Não foi possível cadastrar o destino informado.');
-                }
-            }
-
             $this->distributionDAO->create($destinoId, $campanhaId, $dataEnvio, $itens);
 
             foreach ($itens as $categoriaId => $quantidade) {
@@ -218,40 +297,26 @@ class DistributionController {
             }
 
             Database::getInstance()->commit();
-            SessionManager::setMessage('Distribuição registrada com sucesso e estoque atualizado.', 'sucesso');
+            $this->redirectWithMessage('Distribuicao registrada com sucesso e estoque atualizado.', 'sucesso');
         } catch (Exception $e) {
             Database::getInstance()->rollback();
-            SessionManager::setMessage('Erro ao registrar distribuição: ' . $e->getMessage(), 'erro');
+            $this->redirectWithMessage('Erro ao registrar distribuicao: ' . $e->getMessage());
         }
-
-        header('Location: index.php?page=admin_distributions');
-        exit;
     }
 
     public function markDelivered(): void {
         $this->requireAdmin();
-
-        if (!SessionManager::validateCsrfToken($_POST['csrf_token'] ?? null)) {
-            SessionManager::setMessage('Sua sessão expirou. Atualize a página e tente novamente.', 'erro');
-            header('Location: index.php?page=admin_distributions');
-            exit;
-        }
+        $this->validateCsrfOrRedirect();
 
         $distribuicaoId = (int)($_POST['distribuicao_id'] ?? 0);
         if ($distribuicaoId <= 0) {
-            SessionManager::setMessage('Distribuição inválida.', 'erro');
-            header('Location: index.php?page=admin_distributions');
-            exit;
+            $this->redirectWithMessage('Distribuicao invalida.');
         }
 
         if ($this->distributionDAO->updateStatus($distribuicaoId, 'ENTREGUE')) {
-            SessionManager::setMessage('Distribuição marcada como entregue.', 'sucesso');
-        } else {
-            SessionManager::setMessage('Não foi possível atualizar o status da distribuição.', 'erro');
+            $this->redirectWithMessage('Distribuicao marcada como entregue.', 'sucesso');
         }
 
-        header('Location: index.php?page=admin_distributions');
-        exit;
+        $this->redirectWithMessage('Nao foi possivel atualizar o status da distribuicao.');
     }
 }
-

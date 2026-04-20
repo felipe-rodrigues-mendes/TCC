@@ -186,9 +186,26 @@ CREATE TABLE IF NOT EXISTS destino (
   id_destino INT AUTO_INCREMENT PRIMARY KEY,
   nome VARCHAR(150) NOT NULL,
   id_endereco INT NOT NULL,
+  ativo TINYINT(1) NOT NULL DEFAULT 1,
   CONSTRAINT fk_destino_endereco
     FOREIGN KEY (id_endereco) REFERENCES endereco(id_endereco)
 ) ENGINE=InnoDB;
+
+SET @destino_ativo_exists := (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE()
+    AND TABLE_NAME = 'destino'
+    AND COLUMN_NAME = 'ativo'
+);
+SET @destino_ativo_sql := IF(
+  @destino_ativo_exists = 0,
+  'ALTER TABLE destino ADD COLUMN ativo TINYINT(1) NOT NULL DEFAULT 1 AFTER id_endereco',
+  'SELECT 1'
+);
+PREPARE stmt_destino_ativo FROM @destino_ativo_sql;
+EXECUTE stmt_destino_ativo;
+DEALLOCATE PREPARE stmt_destino_ativo;
 
 CREATE TABLE IF NOT EXISTS distribuicao (
   id_distribuicao INT AUTO_INCREMENT PRIMARY KEY,

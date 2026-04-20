@@ -1,6 +1,22 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+    <?php
+        $appBasePath = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? ''));
+        $appBasePath = ($appBasePath === '/' || $appBasePath === '.') ? '' : rtrim($appBasePath, '/');
+
+        $buildVersionedAssetUrl = function ($relativePath) use ($appBasePath) {
+            $filePath = __DIR__ . '/../../' . $relativePath;
+            $version = file_exists($filePath) ? filemtime($filePath) : time();
+            $baseUrl = ($appBasePath !== '') ? $appBasePath . '/' : '/';
+
+            return $baseUrl . $relativePath . '?v=' . $version;
+        };
+
+        $favicon32Url = $buildVersionedAssetUrl('assets/uploads/favicon-32x32.png');
+        $favicon16Url = $buildVersionedAssetUrl('assets/uploads/favicon-16x16.png');
+        $appleTouchIconUrl = $buildVersionedAssetUrl('assets/uploads/apple-touch-icon.png');
+    ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $title ?? "ConectaSolidária"; ?></title>
@@ -13,6 +29,11 @@
     
     <!-- Bootstrap (opcional) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="icon" type="image/png" sizes="32x32" href="<?php echo htmlspecialchars($favicon32Url); ?>">
+    <link rel="icon" type="image/png" sizes="16x16" href="<?php echo htmlspecialchars($favicon16Url); ?>">
+    <link rel="apple-touch-icon" sizes="180x180" href="<?php echo htmlspecialchars($appleTouchIconUrl); ?>">
+    <link rel="shortcut icon" href="<?php echo htmlspecialchars($favicon32Url); ?>" type="image/png">
 </head>
 <body>
     <!-- Navbar -->

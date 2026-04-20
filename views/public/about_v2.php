@@ -454,7 +454,7 @@
                 <article class="step-card">
                     <div class="step-number">4</div>
                     <h3>Acompanhe a entrega</h3>
-                    <p>O doador pode acompanhar o andamento da contribuição até o envio e a chegada ao destino final da campanha.</p>
+                    <p>O doador pode acompanhar o andamento da contribuição até o envio a instituição de caridadade e de la sua doação seguira para o destino selecionado.</p>
                 </article>
             </div>
         </section>
