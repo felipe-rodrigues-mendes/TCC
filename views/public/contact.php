@@ -1,6 +1,11 @@
 <?php
 // View: Contact
 // Renderizada por PublicController::contact()
+SessionManager::start();
+
+$pontosContato = isset($pontosContato) && is_array($pontosContato) ? $pontosContato : [];
+$totalPontosContato = isset($totalPontosContato) ? (int)$totalPontosContato : count($pontosContato);
+$totalCidadesContato = isset($totalCidadesContato) ? (int)$totalCidadesContato : 0;
 ?>
 
 <!DOCTYPE html>
@@ -8,188 +13,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pontos de Coleta - ConectaSolidária</title>
+    <title>Contato - ConectaSolidaria</title>
     <link rel="stylesheet" href="assets/css/style.css?v=<?= time(); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <style>
-        .contact-container {
-            max-width: 1200px;
-            margin: 20px auto 40px;
-        }
-
-        .contact-header {
-            margin-bottom: 24px;
-        }
-
-        .contact-header h2 {
-            margin-bottom: 8px;
-        }
-
-        .contact-header p {
-            margin-top: 0;
-            margin-bottom: 18px;
-        }
-
-        .contact-channels {
-            background: #eff6ff;
-            border: 1px solid #bfdbfe;
-            border-radius: 12px;
-            padding: 14px 16px;
-            margin: 14px 0 24px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        .channel-item {
-            color: #1f2937;
-            font-size: 15px;
-        }
-
-        .channel-item i {
-            color: #2563eb;
-            margin-right: 6px;
-        }
-
-        .channel-item a {
-            color: #1d4ed8;
-            text-decoration: none;
-            font-weight: 700;
-        }
-
-        .channel-item a:hover {
-            text-decoration: underline;
-        }
-
-        .points-grid {
-            display: flex;
-            gap: 24px;
-            overflow-x: auto;
-            padding-bottom: 16px;
-            scroll-behavior: smooth;
-            align-items: stretch;
-            scrollbar-width: none;
-            margin-top: 20px;
-        }
-
-        .points-grid::-webkit-scrollbar {
-            display: none;
-        }
-
-        .point-card {
-            background: #fff;
-            border-radius: 18px;
-            padding: 28px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-            border: 1px solid #e5e7eb;
-            min-width: 520px;
-            flex: 0 0 520px;
-            min-height: 580px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .point-card h3 {
-            margin-top: 0;
-            margin-bottom: 16px;
-            color: #111827;
-            font-size: 24px;
-        }
-
-        .point-line {
-            margin-bottom: 12px;
-            color: #374151;
-            font-size: 15px;
-        }
-
-        .point-line i {
-            color: #2563eb;
-            margin-right: 8px;
-            width: 18px;
-        }
-
-        .map-wrap {
-            margin-top: 18px;
-            border-radius: 14px;
-            overflow: hidden;
-            border: 1px solid #dbeafe;
-            min-height: 320px;
-        }
-
-        .map-wrap iframe {
-            width: 100%;
-            height: 340px;
-            border: 0;
-            display: block;
-        }
-    </style>
 </head>
 <body>
 
 <?php include(__DIR__ . '/../layouts/navbar.php'); ?>
 
 <main>
-    <section class="contact-container">
-        <div class="contact-header">
-            <h2>Contato e localização</h2>
-            <p>Confira os endereços oficiais e a localização no mapa.</p>
-        </div>
+    <section class="contact-page">
+        <header class="contact-hero">
+            <p class="contact-eyebrow">Atendimento ConectaSolidaria</p>
+            <h1>Contato e Localizacao</h1>
+            <p class="contact-subtitle">
+                Fale com nossa equipe e veja no mapa os pontos oficiais para entrega de doacoes.
+            </p>
 
-        <div class="contact-channels">
-            <div class="channel-item">
-                <i class="fab fa-whatsapp"></i>
-                WhatsApp:
-                <a href="https://wa.me/5561986810428" target="_blank" rel="noopener noreferrer">(61) 98681-0428</a>
+            <div class="contact-stats">
+                <div class="contact-stat">
+                    <strong><?php echo (int)$totalPontosContato; ?></strong>
+                    <span>pontos oficiais</span>
+                </div>
+                <div class="contact-stat">
+                    <strong><?php echo (int)$totalCidadesContato; ?></strong>
+                    <span>cidades com cobertura</span>
+                </div>
             </div>
-            <div class="channel-item">
-                <i class="fas fa-envelope"></i>
-                E-mail:
-                <a href="mailto:ConectaSolidaria@gmail.com">ConectaSolidária@gmail.com</a>
+        </header>
+
+        <section class="contact-channel-grid" aria-label="Canais de contato">
+            <article class="contact-channel-card">
+                <div class="contact-channel-icon">
+                    <i class="fab fa-whatsapp"></i>
+                </div>
+                <div class="contact-channel-body">
+                    <h2>WhatsApp</h2>
+                    <p>Atendimento rapido para duvidas sobre doacao e entrega.</p>
+                    <a href="https://wa.me/5561986810428" target="_blank" rel="noopener noreferrer">
+                        (61) 98681-0428
+                    </a>
+                </div>
+            </article>
+
+            <article class="contact-channel-card">
+                <div class="contact-channel-icon">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <div class="contact-channel-body">
+                    <h2>E-mail</h2>
+                    <p>Envie solicitacoes, parcerias e comunicacoes institucionais.</p>
+                    <a href="mailto:ConectaSolidaria@gmail.com">ConectaSolidaria@gmail.com</a>
+                </div>
+            </article>
+
+            <article class="contact-channel-card">
+                <div class="contact-channel-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="contact-channel-body">
+                    <h2>Horario de atendimento</h2>
+                    <p>Atendimento presencial nos pontos oficiais.</p>
+                    <strong>Segunda a sabado, das 8h as 22h</strong>
+                </div>
+            </article>
+        </section>
+
+        <?php if (empty($pontosContato)): ?>
+            <div class="contact-empty">
+                <p><i class="fas fa-info-circle"></i> Nenhum ponto oficial foi encontrado no momento.</p>
+                <a class="contact-empty-action" href="index.php?page=collection_points">Ver pagina de pontos</a>
             </div>
-            <div class="channel-item">
-                <i class="fas fa-clock"></i>
-                Atendimento presencial:
-                <strong>segunda a sábado, das 8h às 22h</strong>
-            </div>
-        </div>
+        <?php else: ?>
+            <section class="contact-point-grid" aria-label="Pontos com mapa">
+                <?php foreach ($pontosContato as $ponto): ?>
+                    <?php
+                        $nome = (string)($ponto['nome'] ?? '');
+                        $endereco = trim((string)($ponto['endereco'] ?? ''));
+                        $cidade = (string)($ponto['cidade'] ?? '');
+                        $estado = (string)($ponto['estado'] ?? '');
+                        $cep = trim((string)($ponto['cep'] ?? ''));
+                        $mapQuery = trim((string)($ponto['map_query'] ?? ''));
+                        $mapSearchUrl = $mapQuery !== ''
+                            ? 'https://www.google.com/maps/search/?api=1&query=' . urlencode($mapQuery)
+                            : '';
+                    ?>
+                    <article class="contact-point-card">
+                        <div class="contact-point-top">
+                            <h3><?php echo htmlspecialchars($nome); ?></h3>
+                            <?php if ($cidade !== '' || $estado !== ''): ?>
+                                <span class="contact-point-badge">
+                                    <?php echo htmlspecialchars(trim($cidade . ($estado !== '' ? '/' . $estado : ''))); ?>
+                                </span>
+                            <?php endif; ?>
+                        </div>
 
-        <div class="points-grid">
-            <?php foreach ($pontosContato as $ponto): ?>
-                <article class="point-card">
-                    <h3><?php echo htmlspecialchars($ponto['nome']); ?></h3>
+                        <div class="contact-point-line">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span><?php echo htmlspecialchars($endereco); ?></span>
+                        </div>
 
-                    <div class="point-line">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <?php echo htmlspecialchars($ponto['endereco']); ?>
-                    </div>
+                        <?php if ($cep !== ''): ?>
+                            <div class="contact-point-line">
+                                <i class="fas fa-mail-bulk"></i>
+                                <span>CEP: <?php echo htmlspecialchars($cep); ?></span>
+                            </div>
+                        <?php endif; ?>
 
-                    <div class="point-line">
-                        <i class="fas fa-city"></i>
-                        <?php echo htmlspecialchars($ponto['cidade']); ?> / <?php echo htmlspecialchars($ponto['estado']); ?>
-                    </div>
+                        <div class="contact-point-actions">
+                            <?php if ($mapSearchUrl !== ''): ?>
+                                <a
+                                    class="contact-point-action is-primary"
+                                    href="<?php echo htmlspecialchars($mapSearchUrl); ?>"
+                                    target="_blank"
+                                    rel="noopener noreferrer">
+                                    <i class="fas fa-route"></i>
+                                    Abrir rota
+                                </a>
+                            <?php endif; ?>
+                            <a class="contact-point-action" href="index.php?page=donation_create">
+                                <i class="fas fa-hand-holding-heart"></i>
+                                Entregar doacao
+                            </a>
+                        </div>
 
-                    <div class="point-line">
-                        <i class="fas fa-envelope"></i>
-                        CEP: <?php echo htmlspecialchars($ponto['cep']); ?>
-                    </div>
-
-                    <div class="map-wrap">
-                        <iframe
-                            title="Mapa de <?php echo htmlspecialchars($ponto['nome']); ?>"
-                            loading="lazy"
-                            referrerpolicy="no-referrer-when-downgrade"
-                            src="https://www.google.com/maps?q=<?php echo urlencode($ponto['map_query']); ?>&output=embed">
-                        </iframe>
-                    </div>
-                </article>
-            <?php endforeach; ?>
-        </div>
+                        <?php if ($mapQuery !== ''): ?>
+                            <div class="contact-map-wrap">
+                                <iframe
+                                    title="Mapa de <?php echo htmlspecialchars($nome); ?>"
+                                    loading="lazy"
+                                    referrerpolicy="no-referrer-when-downgrade"
+                                    src="https://www.google.com/maps?q=<?php echo urlencode($mapQuery); ?>&output=embed">
+                                </iframe>
+                            </div>
+                        <?php endif; ?>
+                    </article>
+                <?php endforeach; ?>
+            </section>
+        <?php endif; ?>
     </section>
 </main>
 
 <footer>
-    <p>© 2026 ConectaSolidária</p>
+    <p>© 2026 ConectaSolidaria</p>
 </footer>
 
 </body>
