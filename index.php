@@ -200,7 +200,7 @@ function notFound($mensagem) {
         <header class="error-header">
             <div class="logo-container">
                 <a href="index.php">
-              <img src="assets/uploads/logo.PNG" class="logo" alt="Logo ConectaSolidária">
+              <img src="assets/images/logo.PNG" class="logo" alt="Logo ConectaSolidária">
                 </a>
             </div>
         </header>
@@ -321,7 +321,7 @@ function error($mensagem = "Ocorreu um erro interno ao processar sua requisiçã
         <header class="error-header">
             <div class="logo-container">
                 <a href="index.php">
-                    <img src="assets/uploads/logo.PNG" class="logo" alt="Logo ConectaSolidária">
+                    <img src="assets/images/logo.PNG" class="logo" alt="Logo ConectaSolidária">
                 </a>
             </div>
         </header>
@@ -342,3 +342,4 @@ function error($mensagem = "Ocorreu um erro interno ao processar sua requisiçã
     <?php
     exit;
 }
+

@@ -60,7 +60,7 @@ class AdminController {
      * Retorna diretório absoluto das imagens de campanha.
      */
     private function getCampaignUploadDir(): string {
-        return __DIR__ . '/../assets/uploas';
+        return __DIR__ . '/../assets/uploads';
     }
 
     /**
@@ -1002,5 +1002,6 @@ class AdminController {
         exit;
     }
 }
+
 
 

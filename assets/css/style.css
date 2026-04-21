@@ -1,4 +1,4 @@
-﻿*{
+*{
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -606,7 +606,7 @@ section{
     content: "";
     position: absolute;
     inset: 0;
-    background: url('../uploads/logo.PNG') center/140px no-repeat;
+    background: url('../images/logo.PNG') center/140px no-repeat;
     opacity: 0.12;
     pointer-events: none;
     z-index: 0;
@@ -848,7 +848,7 @@ section{
     color: white;
 }
 
-/* FORMULÁRIO */
+/* FORMUL�RIO */
 form{
     max-width: 600px;
     background: var(--bg-surface);
@@ -2050,5 +2050,6 @@ footer{
         padding: 20px 12px;
     }
 }
+
 
 

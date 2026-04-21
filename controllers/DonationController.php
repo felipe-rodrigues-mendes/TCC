@@ -429,8 +429,8 @@ class DonationController {
         $pdf = new SimplePdf();
         $y = 790;
         $logoCandidates = [
-            __DIR__ . '/../assets/uploads/logo_sem_fundo_final.png',
-            __DIR__ . '/../assets/uploads/logo_sem_fundo_final.jpg',
+            __DIR__ . '/../assets/images/logo_sem_fundo_final.png',
+            __DIR__ . '/../assets/images/logo_sem_fundo_final.jpg',
         ];
         $logoSlotX = 380;
         $logoSlotY = 728;
@@ -613,3 +613,4 @@ class DonationController {
         ];
     }
 }
+
