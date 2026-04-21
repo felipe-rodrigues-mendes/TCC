@@ -19,7 +19,7 @@ class PublicController {
 
     private function resolveCampaignImage(int $campaignId, string $titulo, array $imagensCampanhas): string {
         foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
-            $relativePath = 'assets/uploas/campaign_' . $campaignId . '.' . $ext;
+            $relativePath = 'assets/uploads/campaign_' . $campaignId . '.' . $ext;
             $absolutePath = __DIR__ . '/../' . $relativePath;
 
             if (is_file($absolutePath)) {
@@ -27,7 +27,7 @@ class PublicController {
             }
         }
 
-        return $imagensCampanhas[$titulo] ?? 'assets/uploas/logo.PNG';
+        return $imagensCampanhas[$titulo] ?? 'assets/images/logo.PNG';
     }
 
     private function getOfficialCollectionPoints(): array {
@@ -67,12 +67,12 @@ class PublicController {
         $campanhas = $this->campaignDAO->findAll();
 
         $imagensCampanhas = [
-            'Rio Grande do Sul' => 'assets/uploads/enchente Rio Grande do Sul.jpg',
-            'Bahia' => 'assets/uploads/enchente Bahia.jpg',
-            'Minas Gerais' => 'assets/uploads/Minas gerais.jpg',
-            'São Paulo' => 'assets/uploads/enchente Sao paulo.jpg',
-            'Santa Catarina' => 'assets/uploads/santa catarina.jpg',
-            'Paraná' => 'assets/uploads/Parána.jpg'
+            'Rio Grande do Sul' => 'assets/images/enchente Rio Grande do Sul.jpg',
+            'Bahia' => 'assets/images/enchente Bahia.jpg',
+            'Minas Gerais' => 'assets/images/Minas gerais.jpg',
+            'São Paulo' => 'assets/images/enchente Sao paulo.jpg',
+            'Santa Catarina' => 'assets/images/santa catarina.jpg',
+            'Paraná' => 'assets/images/Parána.jpg'
         ];
 
         foreach ($campanhas as &$campanha) {
@@ -144,3 +144,4 @@ class PublicController {
         include __DIR__ . '/../views/public/contact.php';
     }
 }
+

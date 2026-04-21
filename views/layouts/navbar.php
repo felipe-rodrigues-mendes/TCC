@@ -27,7 +27,7 @@ $userName = SessionManager::getUserName();
     <div class="header-top">
         <div class="logo-container">
             <a href="index.php">
-         <img src="assets/uploads/logo.PNG" class="logo" alt="Logo ConectaSolidária">
+         <img src="assets/images/logo.PNG" class="logo" alt="Logo ConectaSolidária">
 </a>
     </div>
 
@@ -141,3 +141,4 @@ $userName = SessionManager::getUserName();
         }
     })();
 </script>
+

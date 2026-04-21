@@ -24,7 +24,7 @@
             min-height: 430px;
             background:
                 linear-gradient(120deg, rgba(15, 23, 42, 0.78), rgba(37, 99, 235, 0.55)),
-                url('assets/uploads/enchente Rio Grande do Sul.jpg') center/cover;
+                url('assets/images/enchente Rio Grande do Sul.jpg') center/cover;
             box-shadow: 0 12px 28px rgba(15, 23, 42, 0.18);
             display: flex;
             align-items: flex-end;
@@ -94,7 +94,7 @@
             content: "";
             position: absolute;
             inset: 0;
-            background: url('assets/uploads/logo.PNG') center/110px no-repeat;
+            background: url('assets/images/logo.PNG') center/110px no-repeat;
             opacity: 0.09;
             pointer-events: none;
             z-index: 0;
@@ -226,7 +226,7 @@
             content: "";
             position: absolute;
             inset: 0;
-            background: url('assets/uploads/logo.PNG') center/120px no-repeat;
+            background: url('assets/images/logo.PNG') center/120px no-repeat;
             opacity: 0.08;
             pointer-events: none;
             z-index: 0;
@@ -266,7 +266,7 @@
         .cta-card {
             background:
                 linear-gradient(135deg, rgba(37, 99, 235, 0.96), rgba(30, 58, 138, 0.94)),
-                url('assets/uploads/enchente Bahia.jpg') center/cover;
+                url('assets/images/enchente Bahia.jpg') center/cover;
             color: white;
             position: relative;
             overflow: hidden;
@@ -420,10 +420,10 @@
                 <p>As campanhas atendidas pelo sistema representam realidades que exigem mobilização rápida, cuidado coletivo e logística humanitária eficiente.</p>
 
                 <div class="gallery-grid">
-                    <img src="assets/uploads/enchente Bahia.jpg" alt="Ações de solidariedade e apoio humanitário na Bahia">
-                    <img src="assets/uploads/Minas gerais.jpg" alt="Comunidades afetadas recebendo apoio em Minas Gerais">
-                    <img src="assets/uploads/enchente Sao paulo.jpg" alt="Mobilização social de ajuda em São Paulo">
-                    <img src="assets/uploads/santa catarina.jpg" alt="Apoio emergencial e rede de solidariedade em Santa Catarina">
+                    <img src="assets/images/enchente Bahia.jpg" alt="Ações de solidariedade e apoio humanitário na Bahia">
+                    <img src="assets/images/Minas gerais.jpg" alt="Comunidades afetadas recebendo apoio em Minas Gerais">
+                    <img src="assets/images/enchente Sao paulo.jpg" alt="Mobilização social de ajuda em São Paulo">
+                    <img src="assets/images/santa catarina.jpg" alt="Apoio emergencial e rede de solidariedade em Santa Catarina">
                 </div>
             </aside>
         </section>
@@ -481,3 +481,4 @@
 
 </body>
 </html>
+
