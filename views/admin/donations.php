@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // View: Admin - Donations
 // Renderizada por AdminController::manageDonations() e receiveDonation()
 SessionManager::requireRole('admin');
@@ -10,6 +10,8 @@ SessionManager::requireRole('admin');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gerenciar Doações - Admin</title>
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico?v=3">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon.png?v=2">
     <link rel="stylesheet" href="assets/css/style.css?v=<?= time(); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
@@ -433,9 +435,9 @@ SessionManager::requireRole('admin');
                                             <button type="submit">Receber</button>
                                         </form>
                                     <?php elseif ($doacao['status'] === 'excluida'): ?>
-                                        <span class="status-nao-recebida">X Não recebida</span>
+                                        <span class="status-nao-recebida">Não recebida</span>
                                     <?php else: ?>
-                                        <span class="status-recebida">✓ Recebida</span>
+                                        <span class="status-recebida">Recebida</span>
                                     <?php endif; ?>
                                 </td>
                             </tr>

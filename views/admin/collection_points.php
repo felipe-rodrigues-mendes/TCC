@@ -8,6 +8,8 @@ SessionManager::requireRole('admin');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pontos de Coleta - Admin</title>
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico?v=3">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon.png?v=2">
     <link rel="stylesheet" href="assets/css/style.css?v=<?= time(); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
@@ -131,7 +133,7 @@ SessionManager::requireRole('admin');
     <div class="page-grid">
         <section class="panel-card">
             <h2>Novo ponto de coleta</h2>
-            <p class="helper">Cadastre novos pontos para liberar recebimento de doacoes em outros locais.</p>
+            <p class="helper">Cadastre novos pontos para liberar recebimento de doações em outros locais.</p>
 
             <form method="POST" action="index.php?page=admin_create_collection_point">
                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(SessionManager::getCsrfToken()); ?>">
@@ -157,7 +159,7 @@ SessionManager::requireRole('admin');
 
         <section class="panel-card">
             <h2>Pontos cadastrados</h2>
-            <p class="helper">Use ativar/desativar para controlar novos recebimentos sem perder o historico.</p>
+            <p class="helper">Use ativar/desativar para controlar novos recebimentos sem perder o histórico.</p>
 
             <?php if (empty($pontosColeta)): ?>
                 <p class="helper">Nenhum ponto de coleta cadastrado no momento.</p>
@@ -190,7 +192,7 @@ SessionManager::requireRole('admin');
                                 <form method="POST"
                                       action="index.php?page=admin_toggle_collection_point_status"
                                       class="inline-form"
-                                      onsubmit="return confirm('<?php echo $pontoAtivo ? 'Desativar este ponto para impedir novas doacoes nele?' : 'Ativar este ponto para liberar novas doacoes nele?'; ?>');">
+                                      onsubmit="return confirm('<?php echo $pontoAtivo ? 'Desativar este ponto para impedir novas doações nele?' : 'Ativar este ponto para liberar novas doações nele?'; ?>');">
                                     <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(SessionManager::getCsrfToken()); ?>">
                                     <input type="hidden" name="ponto_id" value="<?php echo (int)($ponto['id'] ?? 0); ?>">
                                     <input type="hidden" name="novo_status" value="<?php echo $pontoAtivo ? 'desativar' : 'ativar'; ?>">
@@ -208,7 +210,7 @@ SessionManager::requireRole('admin');
 </main>
 
 <footer>
-    <p>© 2026 ConectaSolidaria</p>
+    <p>© 2026 ConectaSolidária</p>
 </footer>
 
 </body>
