@@ -68,22 +68,5 @@ class DonationDTO {
         );
     }
 
-    public function toArray(): array {
-        return [
-            'id' => $this->id,
-            'id_doacao' => $this->id_doacao,
-            'usuario_id' => $this->usuario_id,
-            'campanha_id' => $this->campanha_id,
-            'ponto_id' => $this->ponto_id,
-            'descricao' => $this->descricao,
-            'status' => $this->status,
-            'data_doacao' => $this->data_doacao,
-            'data_criacao' => $this->data_criacao,
-            'campanha_nome' => $this->campanha_nome,
-            'ponto_nome' => $this->ponto_nome,
-            'codigo_publico' => $this->codigo_publico,
-            'itens' => $this->itens
-        ];
-    }
 }
 

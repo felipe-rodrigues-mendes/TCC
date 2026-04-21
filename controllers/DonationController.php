@@ -33,12 +33,7 @@ class DonationController {
     }
 
     private function getDonationPoints(): array {
-        $allowed = ['Ginásio de Taguatinga', 'Escola Técnica de Ceilândia'];
-        $allPoints = $this->pointDAO->findAllNames();
-
-        return array_values(array_filter($allPoints, static function (array $point) use ($allowed): bool {
-            return in_array((string)$point['nome'], $allowed, true);
-        }));
+        return $this->pointDAO->findAllNames(true);
     }
 
     private function formatDonationStatusLabel(string $status): string {

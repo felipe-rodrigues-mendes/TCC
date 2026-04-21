@@ -39,6 +39,12 @@ class AdminController {
         SessionManager::requireRole('admin');
     }
 
+    private function redirectToCollectionPointsWithMessage(string $mensagem, string $tipo = 'erro'): void {
+        SessionManager::setMessage($mensagem, $tipo);
+        header('Location: index.php?page=admin_collection_points');
+        exit;
+    }
+
     /**
      * Define se o usuário é o administrador principal protegido do sistema.
      */
@@ -232,6 +238,132 @@ class AdminController {
 
         $estoquesAgrupados = $this->inventoryDAO->getInventoryByLocation();
         include __DIR__ . '/../views/admin/inventory.php';
+    }
+
+    /**
+     * Renderiza o gerenciamento de pontos de coleta.
+     */
+    public function manageCollectionPoints(): void {
+        $this->requireAdmin();
+
+        $flash = SessionManager::getMessage();
+        $mensagem = $flash['mensagem'] ?? '';
+        $tipoMensagem = $flash['tipo'] ?? '';
+        $pontosColeta = $this->pointDAO->findAll(false);
+
+        include __DIR__ . '/../views/admin/collection_points.php';
+    }
+
+    /**
+     * Cadastra um novo ponto de coleta.
+     */
+    public function createCollectionPoint(): void {
+        $this->requireAdmin();
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: index.php?page=admin_collection_points');
+            exit;
+        }
+
+        if (!SessionManager::validateCsrfToken($_POST['csrf_token'] ?? null)) {
+            $this->redirectToCollectionPointsWithMessage('Sua sessao expirou. Atualize a pagina e tente novamente.');
+        }
+
+        $nome = trim((string)($_POST['novo_ponto_nome'] ?? ''));
+        $logradouro = trim((string)($_POST['novo_ponto_logradouro'] ?? ''));
+        $cidade = trim((string)($_POST['novo_ponto_cidade'] ?? ''));
+        $estado = strtoupper(trim((string)($_POST['novo_ponto_estado'] ?? '')));
+        $cep = trim((string)($_POST['novo_ponto_cep'] ?? ''));
+
+        if ($nome === '' || $logradouro === '' || $cidade === '' || $estado === '' || $cep === '') {
+            $this->redirectToCollectionPointsWithMessage('Preencha todos os campos para cadastrar o ponto de coleta.');
+        }
+
+        $pontoExistente = $this->pointDAO->findByIdentity($nome, $logradouro, $cidade, $estado, $cep);
+        if ($pontoExistente !== null) {
+            $pontoExistenteId = (int)($pontoExistente['id'] ?? 0);
+            $pontoExistenteAtivo = ((int)($pontoExistente['ativo'] ?? 1)) === 1;
+
+            if ($pontoExistenteAtivo) {
+                $this->redirectToCollectionPointsWithMessage('Esse ponto ja esta cadastrado como ativo.');
+            }
+
+            if ($pontoExistenteId <= 0 || !$this->pointDAO->activate($pontoExistenteId)) {
+                $this->redirectToCollectionPointsWithMessage('Nao foi possivel reativar o ponto informado.');
+            }
+
+            $this->redirectToCollectionPointsWithMessage('Ponto reativado com sucesso.', 'sucesso');
+        }
+
+        try {
+            Database::getInstance()->beginTransaction();
+
+            $pointId = $this->pointDAO->create($nome, $logradouro, $cidade, $estado, $cep);
+            if ($pointId === null) {
+                throw new Exception('Nao foi possivel cadastrar o ponto informado.');
+            }
+
+            Database::getInstance()->commit();
+            $this->redirectToCollectionPointsWithMessage('Ponto de coleta cadastrado com sucesso.', 'sucesso');
+        } catch (Exception $e) {
+            Database::getInstance()->rollback();
+            $this->redirectToCollectionPointsWithMessage('Erro ao cadastrar ponto: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Ativa ou desativa um ponto de coleta cadastrado.
+     */
+    public function toggleCollectionPointStatus(): void {
+        $this->requireAdmin();
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: index.php?page=admin_collection_points');
+            exit;
+        }
+
+        if (!SessionManager::validateCsrfToken($_POST['csrf_token'] ?? null)) {
+            $this->redirectToCollectionPointsWithMessage('Sua sessao expirou. Atualize a pagina e tente novamente.');
+        }
+
+        $pointId = (int)($_POST['ponto_id'] ?? 0);
+        if ($pointId <= 0) {
+            $this->redirectToCollectionPointsWithMessage('Ponto de coleta invalido.');
+        }
+
+        $novoStatus = strtolower(trim((string)($_POST['novo_status'] ?? '')));
+        if (!in_array($novoStatus, ['ativar', 'desativar'], true)) {
+            $this->redirectToCollectionPointsWithMessage('Acao de status invalida para o ponto de coleta.');
+        }
+
+        $ponto = $this->pointDAO->findById($pointId);
+        if ($ponto === null) {
+            $this->redirectToCollectionPointsWithMessage('Ponto de coleta nao encontrado.');
+        }
+
+        $estaAtivo = ((int)($ponto['ativo'] ?? 1)) === 1;
+
+        if ($novoStatus === 'ativar') {
+            if ($estaAtivo) {
+                $this->redirectToCollectionPointsWithMessage('O ponto de coleta ja esta ativo.', 'sucesso');
+            }
+
+            if (!$this->pointDAO->activate($pointId)) {
+                $this->redirectToCollectionPointsWithMessage('Nao foi possivel ativar o ponto selecionado.');
+            }
+
+            $this->redirectToCollectionPointsWithMessage('Ponto de coleta ativado com sucesso.', 'sucesso');
+        }
+
+        if (!$estaAtivo) {
+            $this->redirectToCollectionPointsWithMessage('O ponto de coleta ja esta inativo.', 'sucesso');
+        }
+
+        if (!$this->pointDAO->deactivate($pointId)) {
+            $this->redirectToCollectionPointsWithMessage('Nao foi possivel desativar o ponto selecionado.');
+        }
+
+        $this->redirectToCollectionPointsWithMessage('Ponto de coleta desativado com sucesso.', 'sucesso');
     }
 
     /**

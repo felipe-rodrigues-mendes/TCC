@@ -170,15 +170,6 @@ class DestinationDAO {
         return $row ?: null;
     }
 
-    public function existsActiveByIdentity(string $nome, string $logradouro, string $cidade, string $estado, string $cep): bool {
-        $destino = $this->findByIdentity($nome, $logradouro, $cidade, $estado, $cep);
-        if ($destino === null) {
-            return false;
-        }
-
-        return ((int)($destino['ativo'] ?? 1)) === 1;
-    }
-
     private function setActiveStatus(int $destinoId, int $activeValue): bool {
         if (!$this->supportsActiveColumn) {
             error_log('A coluna ativo nao esta disponivel em destino.');

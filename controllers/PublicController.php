@@ -31,17 +31,7 @@ class PublicController {
     }
 
     private function getOfficialCollectionPoints(): array {
-        $allowedNames = ['Escola Técnica de Ceilândia', 'Ginásio de Taguatinga'];
-        $points = array_filter(
-            $this->pointDAO->findAll(),
-            static function (array $point) use ($allowedNames): bool {
-                return in_array((string)$point['nome'], $allowedNames, true);
-            }
-        );
-
-        if (empty($points)) {
-            $points = $this->pointDAO->findAll();
-        }
+        $points = $this->pointDAO->findAll(true);
 
         return array_map([$this, 'formatPointForPublicView'], array_values($points));
     }
@@ -108,14 +98,28 @@ class PublicController {
      * Renderiza página de pontos de coleta
      */
     public function collectionPoints(): void {
-        $cidadeSelecionada = isset($_GET['cidade']) ? trim($_GET['cidade']) : '';
-        $pontos = $this->getOfficialCollectionPoints();
+        $cidadeSelecionada = isset($_GET['cidade']) ? trim((string)$_GET['cidade']) : '';
+        $todosPontos = $this->getOfficialCollectionPoints();
+        $pontos = $todosPontos;
+
+        $cidadesDisponiveis = [];
+        foreach ($todosPontos as $ponto) {
+            $cidade = trim((string)($ponto['cidade'] ?? ''));
+            if ($cidade !== '') {
+                $cidadesDisponiveis[$cidade] = $cidade;
+            }
+        }
+        natcasesort($cidadesDisponiveis);
+        $cidadesDisponiveis = array_values($cidadesDisponiveis);
 
         if (!empty($cidadeSelecionada)) {
             $pontos = array_values(array_filter($pontos, static function (array $ponto) use ($cidadeSelecionada): bool {
                 return mb_strtolower((string)$ponto['cidade']) === mb_strtolower($cidadeSelecionada);
             }));
         }
+
+        $totalPontos = count($todosPontos);
+        $totalCidades = count($cidadesDisponiveis);
 
         include __DIR__ . '/../views/public/collection_points.php';
     }
@@ -125,6 +129,17 @@ class PublicController {
      */
     public function contact(): void {
         $pontosContato = $this->getOfficialCollectionPoints();
+        $totalPontosContato = count($pontosContato);
+
+        $cidadesContato = [];
+        foreach ($pontosContato as $ponto) {
+            $cidade = trim((string)($ponto['cidade'] ?? ''));
+            if ($cidade !== '') {
+                $cidadesContato[$cidade] = $cidade;
+            }
+        }
+        natcasesort($cidadesContato);
+        $totalCidadesContato = count($cidadesContato);
 
         include __DIR__ . '/../views/public/contact.php';
     }

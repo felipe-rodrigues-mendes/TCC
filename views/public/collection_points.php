@@ -2,6 +2,11 @@
 // View: Collection Points
 // Renderizada por PublicController::collectionPoints()
 SessionManager::start();
+
+$cidadeSelecionada = isset($cidadeSelecionada) ? trim((string)$cidadeSelecionada) : '';
+$cidadesDisponiveis = isset($cidadesDisponiveis) && is_array($cidadesDisponiveis) ? $cidadesDisponiveis : [];
+$totalPontos = isset($totalPontos) ? (int)$totalPontos : count($pontos ?? []);
+$totalCidades = isset($totalCidades) ? (int)$totalCidades : count($cidadesDisponiveis);
 ?>
 
 <!DOCTYPE html>
@@ -9,168 +14,154 @@ SessionManager::start();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pontos de Coleta - ConectaSolidária</title>
+    <title>Pontos de Coleta - ConectaSolidaria</title>
     <link rel="stylesheet" href="assets/css/style.css?v=<?= time(); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <style>
-        .pontos-container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .pontos-container > h2 {
-            margin-bottom: 10px;
-        }
-
-        .pontos-container > p {
-            margin-top: 0;
-            margin-bottom: 20px;
-        }
-
-        .pontos-grid {
-            display: flex;
-            gap: 20px;
-            overflow-x: auto;
-            padding-bottom: 10px;
-            scroll-behavior: smooth;
-            margin-top: 30px;
-            align-items: stretch;
-            scrollbar-width: none;
-        }
-
-        .pontos-grid::-webkit-scrollbar {
-            display: none;
-        }
-
-        .card-ponto {
-            background: white;
-            border-radius: 12px;
-            padding: 32px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            transition: 0.3s;
-            border-left: 4px solid #2563eb;
-            min-height: 560px;
-            min-width: 520px;
-            flex: 0 0 520px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .card-ponto:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-        }
-
-        .card-ponto h3 {
-            color: #111827;
-            margin-bottom: 15px;
-            margin-top: 0;
-        }
-
-        .info-ponto {
-            margin-bottom: 10px;
-            color: #374151;
-            font-size: 15px;
-        }
-
-        .info-ponto i {
-            color: #2563eb;
-            margin-right: 8px;
-            width: 20px;
-        }
-
-        .info-ponto a {
-            color: #2563eb;
-            text-decoration: none;
-        }
-
-        .info-ponto a:hover {
-            text-decoration: underline;
-        }
-
-        .vazio {
-            text-align: center;
-            grid-column: 1 / -1;
-            color: #6b7280;
-            padding: 40px;
-        }
-
-        .map-wrap {
-            margin-top: 16px;
-            border-radius: 10px;
-            overflow: hidden;
-            border: 1px solid #dbeafe;
-        }
-
-        .map-wrap iframe {
-            width: 100%;
-            height: 320px;
-            min-height: 320px;
-            border: 0;
-            display: block;
-        }
-    </style>
 </head>
 <body>
 
 <?php include(__DIR__ . '/../layouts/navbar.php'); ?>
 
 <main>
-    <section class="pontos-container">
-        <h2>Pontos de Coleta</h2>
-        <p>Conheça os locais onde você pode fazer sua doação.</p>
+    <section class="collection-page">
+        <header class="collection-hero">
+            <p class="collection-eyebrow">Rede oficial de recebimento</p>
+            <h1>Pontos de Coleta</h1>
+            <p class="collection-subtitle">
+                Encontre o local mais proximo para entregar sua doacao com seguranca e rastreabilidade.
+            </p>
+
+            <div class="collection-stats">
+                <div class="collection-stat">
+                    <strong><?php echo (int)$totalPontos; ?></strong>
+                    <span>pontos ativos</span>
+                </div>
+                <div class="collection-stat">
+                    <strong><?php echo (int)$totalCidades; ?></strong>
+                    <span>cidades atendidas</span>
+                </div>
+            </div>
+
+            <div class="collection-hero-actions">
+                <a class="btn-primary" href="index.php?page=donation_create">
+                    <i class="fas fa-hand-holding-heart"></i>
+                    Fazer uma doacao
+                </a>
+                <a class="collection-link" href="index.php?page=contact">
+                    Ver contatos da rede
+                </a>
+            </div>
+        </header>
+
+        <?php if (!empty($cidadesDisponiveis)): ?>
+            <nav class="collection-filters" aria-label="Filtro por cidade">
+                <?php $allActive = ($cidadeSelecionada === ''); ?>
+                <a
+                    class="collection-chip <?php echo $allActive ? 'is-active' : ''; ?>"
+                    href="index.php?page=collection_points">
+                    Todas as cidades
+                </a>
+
+                <?php foreach ($cidadesDisponiveis as $cidade): ?>
+                    <?php
+                        $isActive = mb_strtolower($cidadeSelecionada) === mb_strtolower((string)$cidade);
+                        $cidadeLabel = (string)$cidade;
+                    ?>
+                    <a
+                        class="collection-chip <?php echo $isActive ? 'is-active' : ''; ?>"
+                        href="index.php?page=collection_points&cidade=<?php echo urlencode($cidadeLabel); ?>">
+                        <?php echo htmlspecialchars($cidadeLabel); ?>
+                    </a>
+                <?php endforeach; ?>
+            </nav>
+        <?php endif; ?>
 
         <?php if (empty($pontos)): ?>
-            <div class="vazio">
-                <p><i class="fas fa-info-circle"></i> Nenhum ponto de coleta disponível no momento.</p>
+            <div class="collection-empty">
+                <p><i class="fas fa-info-circle"></i> Nenhum ponto de coleta encontrado para esse filtro.</p>
+                <?php if ($cidadeSelecionada !== ''): ?>
+                    <a class="collection-empty-action" href="index.php?page=collection_points">Limpar filtro</a>
+                <?php endif; ?>
             </div>
         <?php else: ?>
-            <div class="pontos-grid">
+            <div class="collection-grid">
                 <?php foreach ($pontos as $ponto): ?>
-                    <div class="card-ponto">
-                        <h3><?php echo htmlspecialchars($ponto['nome']); ?></h3>
-                        
-                        <div class="info-ponto">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <?php echo htmlspecialchars($ponto['logradouro']); ?>, 
-                            <?php echo htmlspecialchars($ponto['numero']); ?>
+                    <?php
+                        $nome = (string)($ponto['nome'] ?? '');
+                        $cidade = (string)($ponto['cidade'] ?? '');
+                        $estado = (string)($ponto['estado'] ?? '');
+                        $telefone = trim((string)($ponto['telefone'] ?? ''));
+                        $mapQuery = trim((string)($ponto['map_query'] ?? ''));
+                        $mapSearchUrl = $mapQuery !== ''
+                            ? 'https://www.google.com/maps/search/?api=1&query=' . urlencode($mapQuery)
+                            : '';
+                        $endereco = trim((string)($ponto['endereco'] ?? ''));
+                        $cep = trim((string)($ponto['cep'] ?? ''));
+                    ?>
+                    <article class="collection-card">
+                        <div class="collection-card-top">
+                            <h2><?php echo htmlspecialchars($nome); ?></h2>
+                            <?php if ($cidade !== '' || $estado !== ''): ?>
+                                <span class="collection-city-badge">
+                                    <?php echo htmlspecialchars(trim($cidade . ($estado !== '' ? '/' . $estado : ''))); ?>
+                                </span>
+                            <?php endif; ?>
                         </div>
 
-                        <?php if (!empty($ponto['complemento'])): ?>
-                            <div class="info-ponto">
-                                <i class="fas fa-info-circle"></i>
-                                <?php echo htmlspecialchars($ponto['complemento']); ?>
-                            </div>
-                        <?php endif; ?>
+                        <ul class="collection-info-list">
+                            <?php if ($endereco !== ''): ?>
+                                <li class="collection-info-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span><?php echo htmlspecialchars($endereco); ?></span>
+                                </li>
+                            <?php endif; ?>
 
-                        <div class="info-ponto">
-                            <i class="fas fa-city"></i>
-                            <?php echo htmlspecialchars($ponto['cidade']); ?>, 
-                            <?php echo htmlspecialchars($ponto['estado']); ?> - 
-                            <?php echo htmlspecialchars($ponto['cep']); ?>
-                        </div>
+                            <?php if ($cep !== ''): ?>
+                                <li class="collection-info-item">
+                                    <i class="fas fa-mail-bulk"></i>
+                                    <span>CEP: <?php echo htmlspecialchars($cep); ?></span>
+                                </li>
+                            <?php endif; ?>
 
-                        <?php if (!empty($ponto['telefone'])): ?>
-                            <div class="info-ponto">
-                                <i class="fas fa-phone"></i>
-                                <a href="tel:<?php echo htmlspecialchars($ponto['telefone']); ?>">
-                                    <?php echo htmlspecialchars($ponto['telefone']); ?>
+                            <?php if ($telefone !== ''): ?>
+                                <li class="collection-info-item">
+                                    <i class="fas fa-phone"></i>
+                                    <a href="tel:<?php echo htmlspecialchars($telefone); ?>">
+                                        <?php echo htmlspecialchars($telefone); ?>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                        </ul>
+
+                        <div class="collection-actions">
+                            <?php if ($mapSearchUrl !== ''): ?>
+                                <a
+                                    class="collection-action is-primary"
+                                    href="<?php echo htmlspecialchars($mapSearchUrl); ?>"
+                                    target="_blank"
+                                    rel="noopener noreferrer">
+                                    <i class="fas fa-route"></i>
+                                    Ver rota
                                 </a>
-                            </div>
-                        <?php endif; ?>
+                            <?php endif; ?>
 
-                        <?php if (!empty($ponto['map_query'])): ?>
-                            <div class="map-wrap">
+                            <a class="collection-action" href="index.php?page=donation_create">
+                                <i class="fas fa-box-open"></i>
+                                Entregar doacao
+                            </a>
+                        </div>
+
+                        <?php if ($mapQuery !== ''): ?>
+                            <div class="collection-map-wrap">
                                 <iframe
-                                    title="Mapa de <?php echo htmlspecialchars($ponto['nome']); ?>"
+                                    title="Mapa de <?php echo htmlspecialchars($nome); ?>"
                                     loading="lazy"
                                     referrerpolicy="no-referrer-when-downgrade"
-                                    src="https://www.google.com/maps?q=<?php echo urlencode($ponto['map_query']); ?>&output=embed">
+                                    src="https://www.google.com/maps?q=<?php echo urlencode($mapQuery); ?>&output=embed">
                                 </iframe>
                             </div>
                         <?php endif; ?>
-                    </div>
+                    </article>
                 <?php endforeach; ?>
             </div>
         <?php endif; ?>
@@ -178,7 +169,7 @@ SessionManager::start();
 </main>
 
 <footer>
-    <p>© 2026 ConectaSolidária</p>
+    <p>© 2026 ConectaSolidaria</p>
 </footer>
 
 </body>

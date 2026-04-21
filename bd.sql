@@ -159,9 +159,26 @@ CREATE TABLE IF NOT EXISTS ponto_coleta (
   id_ponto INT AUTO_INCREMENT PRIMARY KEY,
   nome VARCHAR(150) NOT NULL,
   id_endereco INT NOT NULL,
+  ativo TINYINT(1) NOT NULL DEFAULT 1,
   CONSTRAINT fk_ponto_endereco
     FOREIGN KEY (id_endereco) REFERENCES endereco(id_endereco)
 ) ENGINE=InnoDB;
+
+SET @ponto_coleta_ativo_exists := (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE()
+    AND TABLE_NAME = 'ponto_coleta'
+    AND COLUMN_NAME = 'ativo'
+);
+SET @ponto_coleta_ativo_sql := IF(
+  @ponto_coleta_ativo_exists = 0,
+  'ALTER TABLE ponto_coleta ADD COLUMN ativo TINYINT(1) NOT NULL DEFAULT 1 AFTER id_endereco',
+  'SELECT 1'
+);
+PREPARE stmt_ponto_coleta_ativo FROM @ponto_coleta_ativo_sql;
+EXECUTE stmt_ponto_coleta_ativo;
+DEALLOCATE PREPARE stmt_ponto_coleta_ativo;
 
 CREATE TABLE IF NOT EXISTS estoque (
   id_estoque INT AUTO_INCREMENT PRIMARY KEY,
