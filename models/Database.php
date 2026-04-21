@@ -1,8 +1,7 @@
 <?php
 
 /**
- * Classe de gerenciamento centralizado de conexão com banco de dados
- * Refatorado de conexao.php original para padrão seguro e reusável
+ * Classe de gerenciamento centralizado de conexao com banco de dados.
  */
 class Database {
     private static $instance = null;
@@ -16,7 +15,7 @@ class Database {
         $this->conn = new mysqli($this->host, $this->user, $this->password, $this->database);
 
         if ($this->conn->connect_error) {
-            error_log("Erro de conexão com banco de dados: " . $this->conn->connect_error);
+            error_log("Erro de conexao com banco de dados: " . $this->conn->connect_error);
             die("Erro ao conectar ao banco de dados. Contate o administrador.");
         }
 
@@ -24,52 +23,41 @@ class Database {
     }
 
     /**
-     * Obtém instância única de conexão (Singleton)
-     * @return Database
+     * Obtem instancia unica de conexao (Singleton).
      */
     public static function getInstance(): Database {
         if (self::$instance === null) {
             self::$instance = new Database();
         }
+
         return self::$instance;
     }
 
     /**
-     * Retorna objeto MySQLi para usar em DAOs
-     * @return mysqli
+     * Retorna objeto MySQLi para usar em DAOs.
      */
     public function getConnection(): mysqli {
         return $this->conn;
     }
 
     /**
-     * Fecha conexão (chamado ao final da aplicação)
-     */
-    public function closeConnection(): void {
-        if ($this->conn) {
-            $this->conn->close();
-        }
-    }
-
-    /**
-     * Inicia transação
+     * Inicia transacao.
      */
     public function beginTransaction(): void {
         $this->conn->begin_transaction();
     }
 
     /**
-     * Confirma transação
+     * Confirma transacao.
      */
     public function commit(): void {
         $this->conn->commit();
     }
 
     /**
-     * Desfaz transação
+     * Desfaz transacao.
      */
     public function rollback(): void {
         $this->conn->rollback();
     }
 }
-

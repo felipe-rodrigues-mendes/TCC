@@ -55,19 +55,5 @@ class CampaignDTO {
         );
     }
 
-    public function toArray(): array {
-        return [
-            'id' => $this->id,
-            'id_campanha' => $this->id_campanha,
-            'titulo' => $this->titulo,
-            'descricao' => $this->descricao,
-            'data_inicio' => $this->data_inicio,
-            'data_fim' => $this->data_fim,
-            'status' => $this->status,
-            'id_usuario' => $this->id_usuario,
-            'imagem' => $this->imagem,
-            'necessidades' => $this->necessidades
-        ];
-    }
 }
 

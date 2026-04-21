@@ -283,38 +283,6 @@ class DonationDAO {
      * @param string $status
      * @return array
      */
-    public function findByStatus(string $status): array {
-        $status = $this->normalizeStatus($status);
-
-        $sql = '
-            SELECT d.id_doacao AS id, d.id_usuario AS usuario_id, d.id_campanha AS campanha_id, d.id_ponto AS ponto_id,
-                   d.data_doacao AS data_criacao, d.status, u.nome AS usuario_nome, pc.nome AS ponto_nome
-            FROM doacao d
-            INNER JOIN usuario u ON d.id_usuario = u.id_usuario
-            INNER JOIN ponto_coleta pc ON d.id_ponto = pc.id_ponto
-            WHERE d.status = ?
-            ORDER BY d.data_doacao DESC, d.id_doacao DESC
-        ';
-        $stmt = $this->conn->prepare($sql);
-
-        if (!$stmt) {
-            error_log('Erro ao preparar busca por status: ' . $this->conn->error);
-            return [];
-        }
-
-        $stmt->bind_param('s', $status);
-        $stmt->execute();
-        $resultado = $stmt->get_result();
-
-        $doacoes = [];
-        while ($dados = $resultado->fetch_assoc()) {
-            $doacoes[] = $this->hydrateDonationRow($dados);
-        }
-
-        $stmt->close();
-        return $doacoes;
-    }
-
     /**
      * Atualiza status da doação.
      * @param int $doacao_id

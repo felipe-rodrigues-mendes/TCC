@@ -282,32 +282,5 @@ class InventoryDAO {
         $stmtUpdate->close();
     }
 
-    /**
-     * Busca estoque por ID.
-     * @param int $estoque_id
-     * @return array|null
-     */
-    public function getEstoqueById(int $estoque_id): ?array {
-        $sql = 'SELECT id_estoque AS id, id_ponto AS ponto_id FROM estoque WHERE id_estoque = ? LIMIT 1';
-        $stmt = $this->conn->prepare($sql);
-
-        if (!$stmt) {
-            error_log('Erro ao preparar busca de estoque: ' . $this->conn->error);
-            return null;
-        }
-
-        $stmt->bind_param('i', $estoque_id);
-        $stmt->execute();
-        $resultado = $stmt->get_result();
-
-        if ($resultado->num_rows === 1) {
-            $estoque = $resultado->fetch_assoc();
-            $stmt->close();
-            return $estoque;
-        }
-
-        $stmt->close();
-        return null;
-    }
 }
 

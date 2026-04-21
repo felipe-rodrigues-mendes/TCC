@@ -31,17 +31,7 @@ class PublicController {
     }
 
     private function getOfficialCollectionPoints(): array {
-        $allowedNames = ['Escola Técnica de Ceilândia', 'Ginásio de Taguatinga'];
-        $points = array_filter(
-            $this->pointDAO->findAll(),
-            static function (array $point) use ($allowedNames): bool {
-                return in_array((string)$point['nome'], $allowedNames, true);
-            }
-        );
-
-        if (empty($points)) {
-            $points = $this->pointDAO->findAll();
-        }
+        $points = $this->pointDAO->findAll(true);
 
         return array_map([$this, 'formatPointForPublicView'], array_values($points));
     }

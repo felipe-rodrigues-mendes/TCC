@@ -102,8 +102,8 @@ class AuthController {
 
             if (empty($nome) || empty($email) || empty($senha) || empty($confirmarSenha)) {
                 $mensagem = 'Nome, email, senha e confirmação de senha são obrigatórios.';
-            } elseif (strlen($senha) < 6) {
-                $mensagem = 'Senha deve ter no mínimo 6 caracteres.';
+            } elseif (($erroSenha = $this->getPasswordPolicyError($senha)) !== '') {
+                $mensagem = $erroSenha;
             } elseif ($senha !== $confirmarSenha) {
                 $mensagem = 'A confirmação da senha não confere.';
             } elseif (!$aceitaTermos) {
@@ -123,6 +123,33 @@ class AuthController {
         include __DIR__ . '/../views/auth/register.php';
     }
 
+    private function getPasswordPolicyError(string $senha): string {
+        if (strlen($senha) < 8) {
+            return 'A senha deve ter no mínimo 8 caracteres.';
+        }
+
+        if (strlen($senha) > 70) {
+            return 'A senha deve ter no máximo 70 caracteres.';
+        }
+
+        if (!preg_match('/[A-Z]/', $senha)) {
+            return 'A senha deve ter pelo menos uma letra maiúscula.';
+        }
+
+        if (!preg_match('/[a-z]/', $senha)) {
+            return 'A senha deve ter pelo menos uma letra minúscula.';
+        }
+
+        if (!preg_match('/\\d/', $senha)) {
+            return 'A senha deve ter pelo menos um número.';
+        }
+
+        if (!preg_match('/[^a-zA-Z0-9]/', $senha)) {
+            return 'A senha deve ter pelo menos um caractere especial.';
+        }
+
+        return '';
+    }
     /**
      * Renderiza e processa recuperação de senha.
      */

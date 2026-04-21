@@ -47,6 +47,7 @@ $userName = SessionManager::getUserName();
             <a href="index.php?page=admin_campaign_cards"><i class="fas fa-layer-group"></i> Campanhas</a>
             <a href="index.php?page=admin_inventory"><i class="fas fa-boxes-stacked"></i> Estoque</a>
             <a href="index.php?page=admin_distributions"><i class="fas fa-truck"></i> Distribui&ccedil;&otilde;es</a>
+            <a href="index.php?page=admin_collection_points"><i class="fas fa-location-dot"></i> Pontos (Admin)</a>
             <a href="index.php?page=dashboard"><i class="fas fa-user-circle"></i> Painel</a>
             <a href="index.php"><i class="fas fa-home"></i> In&iacute;cio</a>
             <a href="index.php?page=collection_points"><i class="fas fa-location-dot"></i> Pontos de Coleta</a>

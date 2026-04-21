@@ -71,25 +71,6 @@ class UserDTO {
         );
     }
 
-    /**
-     * Converte DTO em array (para JSON ou templates).
-     */
-    public function toArray(): array {
-        return [
-            'id' => $this->id,
-            'id_usuario' => $this->id_usuario,
-            'nome' => $this->nome,
-            'email' => $this->email,
-            'telefone' => $this->telefone,
-            'ativo' => $this->ativo,
-            'id_perfil' => $this->id_perfil,
-            'tipo' => $this->tipo,
-            'username' => $this->username,
-            'senha_hash' => $this->senha_hash,
-            'ultimo_acesso' => $this->ultimo_acesso,
-            'perfil_nome' => $this->perfil_nome
-        ];
-    }
 }
 
 
