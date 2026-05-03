@@ -14,6 +14,57 @@ class UserDAO {
         $this->conn = Database::getInstance()->getConnection();
     }
 
+    private function hasUsuarioColumn(string $columnName): bool {
+        $columnNameEscaped = $this->conn->real_escape_string($columnName);
+        $sql = "SHOW COLUMNS FROM usuario LIKE '{$columnNameEscaped}'";
+        $result = $this->conn->query($sql);
+
+        if ($result === false) {
+            error_log('Erro ao validar coluna em usuario: ' . $this->conn->error);
+            return false;
+        }
+
+        return $result->num_rows > 0;
+    }
+
+    private function ensureLgpdColumns(): bool {
+        $hasAceiteLgpd = $this->hasUsuarioColumn('aceite_termos_lgpd');
+        $hasAceiteData = $this->hasUsuarioColumn('aceite_termos_data');
+        $hasAceiteVersao = $this->hasUsuarioColumn('aceite_termos_versao');
+
+        if ($hasAceiteLgpd && $hasAceiteData && $hasAceiteVersao) {
+            return true;
+        }
+
+        if (!$hasAceiteLgpd) {
+            $sql = 'ALTER TABLE usuario ADD COLUMN aceite_termos_lgpd TINYINT(1) NOT NULL DEFAULT 0 AFTER id_perfil';
+            if (!$this->conn->query($sql) && (int)$this->conn->errno !== 1060) {
+                error_log('Erro ao adicionar coluna aceite_termos_lgpd em usuario: ' . $this->conn->error);
+                return false;
+            }
+        }
+
+        if (!$hasAceiteData) {
+            $sql = 'ALTER TABLE usuario ADD COLUMN aceite_termos_data DATETIME NULL AFTER aceite_termos_lgpd';
+            if (!$this->conn->query($sql) && (int)$this->conn->errno !== 1060) {
+                error_log('Erro ao adicionar coluna aceite_termos_data em usuario: ' . $this->conn->error);
+                return false;
+            }
+        }
+
+        if (!$hasAceiteVersao) {
+            $sql = 'ALTER TABLE usuario ADD COLUMN aceite_termos_versao VARCHAR(20) DEFAULT NULL AFTER aceite_termos_data';
+            if (!$this->conn->query($sql) && (int)$this->conn->errno !== 1060) {
+                error_log('Erro ao adicionar coluna aceite_termos_versao em usuario: ' . $this->conn->error);
+                return false;
+            }
+        }
+
+        return $this->hasUsuarioColumn('aceite_termos_lgpd')
+            && $this->hasUsuarioColumn('aceite_termos_data')
+            && $this->hasUsuarioColumn('aceite_termos_versao');
+    }
+
     private function getPerfilIdByNome(string $nome, bool $criarSeNaoExistir = true): ?int {
         $sql = 'SELECT id_perfil FROM perfil WHERE nome = ? LIMIT 1';
         $stmt = $this->conn->prepare($sql);
@@ -216,6 +267,11 @@ class UserDAO {
 
         if ($this->exists($email)) {
             error_log('Usuário já existe: email=' . $email);
+            return null;
+        }
+
+        if (!$this->ensureLgpdColumns()) {
+            error_log('Falha ao garantir colunas LGPD em usuario para registro');
             return null;
         }
 

@@ -8,6 +8,8 @@ SessionManager::requireRole('admin');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Distribuições - Admin</title>
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico?v=3">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon.png?v=2">
     <link rel="stylesheet" href="assets/css/style.css?v=<?= time(); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
@@ -278,9 +280,9 @@ SessionManager::requireRole('admin');
                     <?php endforeach; ?>
                 </select>
 
-                <label for="destino_id">Instituicao cadastrada</label>
+                <label for="destino_id">Instituição cadastrada</label>
                 <select name="destino_id" id="destino_id" required>
-                    <option value="">-- Selecionar instituicao cadastrada --</option>
+                    <option value="">-- Selecionar instituição cadastrada --</option>
                     <?php foreach ($destinos as $destino): ?>
                         <option value="<?php echo (int)$destino['id']; ?>">
                             <?php echo htmlspecialchars($destino['label']); ?>
@@ -289,7 +291,7 @@ SessionManager::requireRole('admin');
                 </select>
 
                 <div class="destination-select-note">
-                    <p class="helper">Use somente instituicoes cadastradas. Se precisar de uma nova, cadastre no painel abaixo.</p>
+                    <p class="helper">Use somente instituições cadastradas. Se precisar de uma nova, cadastre no painel abaixo.</p>
                 </div>
 
                 <label for="data_envio">Data de envio</label>
@@ -305,15 +307,15 @@ SessionManager::requireRole('admin');
         </section>
 
         <section class="panel-card">
-            <h2>Instituicoes de caridade</h2>
-            <p class="helper">Cadastre novas instituicoes para entrega e use ativar/desativar para controlar a disponibilidade sem excluir historico.</p>
+            <h2>Instituições de caridade</h2>
+            <p class="helper">Cadastre novas instituições para entrega e use ativar/desativar para controlar a disponibilidade sem excluir histórico.</p>
 
             <form method="POST" action="index.php?page=admin_distributions">
                 <input type="hidden" name="cadastrar_destino" value="1">
                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(SessionManager::getCsrfToken()); ?>">
 
-                <label for="novo_destino_nome">Nome da instituicao</label>
-                <input type="text" name="novo_destino_nome" id="novo_destino_nome" placeholder="Nome da instituicao" required>
+                <label for="novo_destino_nome">Nome da instituição</label>
+                <input type="text" name="novo_destino_nome" id="novo_destino_nome" placeholder="Nome da instituição" required>
 
                 <label for="novo_destino_logradouro">Logradouro</label>
                 <input type="text" name="novo_destino_logradouro" id="novo_destino_logradouro" placeholder="Logradouro" required>
@@ -327,12 +329,12 @@ SessionManager::requireRole('admin');
                 <label for="novo_destino_cep">CEP</label>
                 <input type="text" name="novo_destino_cep" id="novo_destino_cep" placeholder="CEP" required>
 
-                <button type="submit">Cadastrar instituicao</button>
+                <button type="submit">Cadastrar instituição</button>
             </form>
 
-            <h3>Instituicoes cadastradas</h3>
+            <h3>Instituições cadastradas</h3>
             <?php if (empty($instituicoes)): ?>
-                <p class="helper">Nenhuma instituicao cadastrada no momento.</p>
+                <p class="helper">Nenhuma instituição cadastrada no momento.</p>
             <?php else: ?>
                 <div class="institution-list">
                     <?php foreach ($instituicoes as $instituicao): ?>
@@ -352,13 +354,13 @@ SessionManager::requireRole('admin');
                                     </div>
                                     <div class="muted">CEP: <?php echo htmlspecialchars($instituicao['cep']); ?></div>
                                 </div>
-                                <form method="POST" action="index.php?page=admin_distributions" class="inline-form" onsubmit="return confirm('<?php echo $instituicaoAtiva ? 'Desativar esta instituicao para impedir novas distribuicoes?' : 'Ativar esta instituicao para permitir novas distribuicoes?'; ?>');">
+                                <form method="POST" action="index.php?page=admin_distributions" class="inline-form" onsubmit="return confirm('<?php echo $instituicaoAtiva ? 'Desativar esta instituição para impedir novas distribuições?' : 'Ativar esta instituição para permitir novas distribuições?'; ?>');">
                                     <input type="hidden" name="alterar_status_destino" value="1">
                                     <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(SessionManager::getCsrfToken()); ?>">
                                     <input type="hidden" name="destino_id" value="<?php echo (int)$instituicao['id']; ?>">
                                     <input type="hidden" name="novo_status" value="<?php echo $instituicaoAtiva ? 'desativar' : 'ativar'; ?>">
                                     <button type="submit" class="<?php echo $instituicaoAtiva ? 'danger-button' : 'activate-button'; ?>">
-                                        <?php echo $instituicaoAtiva ? 'Desativar instituicao' : 'Ativar instituicao'; ?>
+                                        <?php echo $instituicaoAtiva ? 'Desativar instituição' : 'Ativar instituição'; ?>
                                     </button>
                                 </form>
                             </div>

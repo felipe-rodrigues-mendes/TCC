@@ -132,7 +132,9 @@ function notFound($mensagem) {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>404 - Página Não Encontrada</title>
-        <link rel="stylesheet" href="assets/css/style.css?v=<?= time(); ?>">
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico?v=3">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon.png?v=2">
+    <link rel="stylesheet" href="assets/css/style.css?v=<?= time(); ?>">
         <script>
             (function () {
                 const storageKey = 'conecta-theme';
@@ -235,7 +237,9 @@ function error($mensagem = "Ocorreu um erro interno ao processar sua requisiçã
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Erro - ConectaSolidária</title>
-        <link rel="stylesheet" href="assets/css/style.css?v=<?= time(); ?>">
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico?v=3">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon.png?v=2">
+    <link rel="stylesheet" href="assets/css/style.css?v=<?= time(); ?>">
         <script>
             (function () {
                 const storageKey = 'conecta-theme';
