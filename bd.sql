@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS usuario (
   nome VARCHAR(150) NOT NULL,
   email VARCHAR(150) NOT NULL UNIQUE,
   telefone VARCHAR(20) DEFAULT NULL,
+  foto_perfil VARCHAR(255) DEFAULT NULL,
   ativo TINYINT(1) NOT NULL DEFAULT 1,
   id_perfil INT NOT NULL,
   aceite_termos_lgpd TINYINT(1) NOT NULL DEFAULT 0,
@@ -80,6 +81,23 @@ SET @sql_add_aceite_termos_versao = (
 PREPARE stmt_add_aceite_termos_versao FROM @sql_add_aceite_termos_versao;
 EXECUTE stmt_add_aceite_termos_versao;
 DEALLOCATE PREPARE stmt_add_aceite_termos_versao;
+
+SET @sql_add_foto_perfil = (
+  SELECT IF(
+    EXISTS (
+      SELECT 1
+      FROM information_schema.COLUMNS
+      WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = 'usuario'
+        AND COLUMN_NAME = 'foto_perfil'
+    ),
+    'SELECT 1',
+    'ALTER TABLE usuario ADD COLUMN foto_perfil VARCHAR(255) DEFAULT NULL AFTER telefone'
+  )
+);
+PREPARE stmt_add_foto_perfil FROM @sql_add_foto_perfil;
+EXECUTE stmt_add_foto_perfil;
+DEALLOCATE PREPARE stmt_add_foto_perfil;
 
 CREATE TABLE IF NOT EXISTS login (
   id_login INT AUTO_INCREMENT PRIMARY KEY,

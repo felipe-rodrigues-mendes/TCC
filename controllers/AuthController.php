@@ -31,6 +31,11 @@ class AuthController {
             $tipoMensagem = 'sucesso';
         }
 
+        if (isset($_GET['conta']) && $_GET['conta'] === 'excluida') {
+            $mensagem = 'Sua conta foi excluída com sucesso.';
+            $tipoMensagem = 'sucesso';
+        }
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!SessionManager::validateCsrfToken($_POST['csrf_token'] ?? null)) {
                 $mensagem = 'Sua sessão expirou. Atualize a página e tente novamente.';
@@ -188,6 +193,63 @@ class AuthController {
         }
 
         include __DIR__ . '/../views/auth/forgot_password.php';
+    }
+
+    /**
+     * Exclui a propria conta do usuario autenticado.
+     */
+    public function deleteAccount(): void {
+        SessionManager::requireLogin('index.php?page=dashboard');
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: index.php?page=dashboard');
+            exit;
+        }
+
+        if (!SessionManager::validateCsrfToken($_POST['csrf_token'] ?? null)) {
+            SessionManager::setMessage('Sua sessão expirou. Atualize a página e tente novamente.', 'erro');
+            header('Location: index.php?page=dashboard');
+            exit;
+        }
+
+        $usuarioId = (int)(SessionManager::getUserId() ?? 0);
+        $senha = trim((string)($_POST['senha_confirmacao'] ?? ''));
+        $confirmacao = (string)($_POST['confirmar_exclusao'] ?? '');
+
+        if ($usuarioId <= 0 || $senha === '' || $confirmacao !== '1') {
+            SessionManager::setMessage('Confirme a exclusão e informe sua senha atual.', 'erro');
+            header('Location: index.php?page=dashboard');
+            exit;
+        }
+
+        $usuario = $this->userDAO->findById($usuarioId);
+        if ($usuario === null || !$usuario->ativo || empty($usuario->senha_hash)) {
+            SessionManager::setMessage('Não foi possível localizar sua conta ativa.', 'erro');
+            header('Location: index.php?page=dashboard');
+            exit;
+        }
+
+        if ($usuario->tipo === 'admin') {
+            SessionManager::setMessage('Contas administrativas não podem ser excluídas por este fluxo.', 'erro');
+            header('Location: index.php?page=dashboard');
+            exit;
+        }
+
+        if (!password_verify($senha, $usuario->senha_hash)) {
+            SessionManager::setMessage('Senha atual incorreta. A conta não foi excluída.', 'erro');
+            header('Location: index.php?page=dashboard');
+            exit;
+        }
+
+        if (!$this->userDAO->deleteOwnAccount($usuarioId)) {
+            SessionManager::setMessage('Não foi possível excluir sua conta. Tente novamente.', 'erro');
+            header('Location: index.php?page=dashboard');
+            exit;
+        }
+
+        SessionManager::destroy();
+        header('Location: index.php?page=login&conta=excluida');
+        exit;
     }
 
     /**

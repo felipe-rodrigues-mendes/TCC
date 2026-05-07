@@ -2,6 +2,11 @@
 // View: User Dashboard
 // Renderizada por DonationController::dashboard()
 SessionManager::requireLogin();
+$usuarioPerfil = $usuario ?? null;
+$nomePerfil = $usuarioPerfil ? $usuarioPerfil->nome : (SessionManager::getUserName() ?? 'Usuário');
+$tipoPerfilRaw = strtolower((string)($usuarioPerfil ? $usuarioPerfil->tipo : (SessionManager::getUserRole() ?? 'doador')));
+$tipoPerfilLabel = $tipoPerfilRaw === 'admin' ? 'Admin' : 'Doador';
+$fotoPerfil = trim((string)($usuarioPerfil ? $usuarioPerfil->foto_perfil : ''));
 ?>
 
 <!DOCTYPE html>
@@ -31,6 +36,147 @@ SessionManager::requireLogin();
 
         .painel-header h2 {
             margin: 0;
+        }
+
+        .profile-card {
+            display: grid;
+            grid-template-columns: auto minmax(220px, 1fr);
+            gap: 18px;
+            align-items: center;
+            background: var(--bg-surface);
+            border: 1px solid var(--cinza-borda);
+            border-radius: 14px;
+            box-shadow: var(--sombra);
+            padding: 20px;
+            margin-bottom: 22px;
+        }
+
+        .profile-photo {
+            width: 128px;
+            height: 128px;
+            border-radius: 50%;
+            overflow: hidden;
+            background: #dbeafe;
+            color: #1d4ed8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 38px;
+            border: 3px solid #bfdbfe;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .profile-photo-trigger {
+            width: 128px;
+            height: 128px;
+            border-radius: 50%;
+            display: block;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .profile-photo-trigger:hover .profile-photo {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.14);
+        }
+
+        .profile-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-info h3 {
+            margin: 0 0 8px;
+            color: var(--preto);
+            font-size: 22px;
+        }
+
+        .profile-info {
+            min-width: 0;
+        }
+
+        .profile-role {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 12px;
+            border-radius: 999px;
+            background: #eff6ff;
+            color: #1e3a8a;
+            border: 1px solid #bfdbfe;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .profile-upload-form {
+            max-width: none;
+            padding: 0;
+            background: transparent;
+            border: 0;
+            box-shadow: none;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .profile-upload-form input[type="file"] {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .profile-upload-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .profile-upload-form button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 34px;
+            padding: 7px 12px;
+            border-radius: 999px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            font-size: 13px;
+        }
+
+        .profile-file-name {
+            color: var(--texto-suave);
+            font-size: 12px;
+            min-height: 16px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 360px;
+            display: none;
+        }
+
+        .profile-upload-form.has-file .profile-file-name {
+            display: block;
+        }
+
+        .profile-upload-form button {
+            display: none;
+            width: auto;
+            border-radius: 999px;
+        }
+
+        .profile-upload-form.has-file button {
+            display: inline-flex;
         }
 
         .btn-doacao {
@@ -328,8 +474,97 @@ SessionManager::requireLogin();
             background: #fecaca;
         }
 
+        .account-danger-zone {
+            margin-top: 32px;
+            padding: 22px;
+            border: 1px solid var(--cinza-borda);
+            border-radius: 12px;
+            background: var(--bg-surface);
+            box-shadow: var(--sombra);
+        }
+
+        .account-danger-zone h3 {
+            margin: 0 0 8px;
+            color: var(--preto);
+        }
+
+        .account-danger-zone p {
+            margin: 0 0 16px;
+            color: var(--texto-suave);
+            line-height: 1.5;
+        }
+
+        .account-delete-form {
+            max-width: none;
+            background: transparent;
+            border: 0;
+            box-shadow: none;
+            padding: 0;
+        }
+
+        .account-delete-grid {
+            display: grid;
+            grid-template-columns: minmax(220px, 1fr) auto;
+            gap: 12px;
+            align-items: end;
+        }
+
+        .account-delete-confirm {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin: 10px 0 14px;
+            color: var(--texto);
+            font-weight: bold;
+        }
+
+        .account-delete-confirm input {
+            width: auto;
+            margin: 3px 0 0;
+        }
+
+        [data-theme="dark"] .account-danger-zone {
+            background: var(--bg-surface);
+            border-color: var(--cinza-borda);
+        }
+
+        [data-theme="dark"] .account-danger-zone h3 {
+            color: var(--texto);
+        }
+
+        [data-theme="dark"] .account-danger-zone p,
+        [data-theme="dark"] .account-delete-confirm {
+            color: var(--texto-suave);
+        }
+
+        [data-theme="dark"] .profile-photo {
+            background: rgba(59, 130, 246, 0.18);
+            color: #bfdbfe;
+            border-color: rgba(147, 197, 253, 0.45);
+        }
+
+        [data-theme="dark"] .profile-role {
+            background: rgba(59, 130, 246, 0.18);
+            color: #bfdbfe;
+            border-color: rgba(147, 197, 253, 0.45);
+        }
+
         @media (max-width: 900px) {
+            .profile-card {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-photo,
+            .profile-photo-trigger {
+                width: 112px;
+                height: 112px;
+            }
+
             .doacoes-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .account-delete-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -353,6 +588,35 @@ SessionManager::requireLogin();
                 <?php echo htmlspecialchars($mensagem); ?>
             </div>
         <?php endif; ?>
+
+        <section class="profile-card" aria-label="Perfil do usuário">
+            <label for="foto_perfil" class="profile-photo-trigger" title="Alterar foto de perfil">
+                <span class="profile-photo">
+                    <?php if ($fotoPerfil !== ''): ?>
+                        <img src="<?php echo htmlspecialchars($fotoPerfil); ?>" alt="Foto de perfil de <?php echo htmlspecialchars($nomePerfil); ?>">
+                    <?php else: ?>
+                        <i class="fas fa-user"></i>
+                    <?php endif; ?>
+                </span>
+            </label>
+            <div class="profile-info">
+                <h3><?php echo htmlspecialchars($nomePerfil); ?></h3>
+                <span class="profile-role">
+                    <i class="fas <?php echo $tipoPerfilRaw === 'admin' ? 'fa-user-shield' : 'fa-hand-holding-heart'; ?>"></i>
+                    Tipo: <?php echo htmlspecialchars($tipoPerfilLabel); ?>
+                </span>
+                <form method="POST" action="index.php?page=profile_photo_update" enctype="multipart/form-data" class="profile-upload-form" id="profile-upload-form">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(SessionManager::getCsrfToken()); ?>">
+                    <input type="file" name="foto_perfil" id="foto_perfil" accept="image/*" required>
+                    <div class="profile-upload-actions">
+                        <button type="submit" class="btn-secundario">
+                            <i class="fas fa-check"></i> Salvar foto
+                        </button>
+                    </div>
+                    <div class="profile-file-name" id="profile-file-name"></div>
+                </form>
+            </div>
+        </section>
 
         <div class="stats-box">
             <i class="fas fa-gift"></i> Total de Doações: <?php echo count($doacoes); ?>
@@ -464,12 +728,51 @@ SessionManager::requireLogin();
                 <?php endforeach; ?>
             </div>
         <?php endif; ?>
+
+        <?php if (SessionManager::getUserRole() !== 'admin'): ?>
+            <section class="account-danger-zone" aria-labelledby="account-delete-title">
+                <h3 id="account-delete-title"><i class="fas fa-user-slash"></i> Excluir minha conta</h3>
+                <p>Ao excluir sua conta, seu acesso será removido e seus dados pessoais serão anonimizados. O histórico de doações permanece no sistema para controle das campanhas.</p>
+                <form method="POST" action="index.php?page=account_delete" class="account-delete-form" onsubmit="return confirm('Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.');">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(SessionManager::getCsrfToken()); ?>">
+                    <div class="account-delete-grid">
+                        <div>
+                            <label for="senha_confirmacao">Senha atual</label>
+                            <input type="password" id="senha_confirmacao" name="senha_confirmacao" autocomplete="current-password" required>
+                        </div>
+                        <button type="submit" class="btn-perigo">
+                            <i class="fas fa-trash"></i> Excluir conta
+                        </button>
+                    </div>
+                    <label class="account-delete-confirm">
+                        <input type="checkbox" name="confirmar_exclusao" value="1" required>
+                        Entendo que perderei o acesso a esta conta.
+                    </label>
+                </form>
+            </section>
+        <?php endif; ?>
     </div>
 </main>
 
 <footer>
     <p>© 2026 ConectaSolidária</p>
 </footer>
+
+<script>
+    const profilePhotoInput = document.getElementById('foto_perfil');
+    const profileFileName = document.getElementById('profile-file-name');
+    const profileUploadForm = document.getElementById('profile-upload-form');
+
+    if (profilePhotoInput && profileFileName) {
+        profilePhotoInput.addEventListener('change', function () {
+            const file = this.files && this.files.length > 0 ? this.files[0] : null;
+            profileFileName.textContent = file ? file.name : '';
+            if (profileUploadForm) {
+                profileUploadForm.classList.toggle('has-file', Boolean(file));
+            }
+        });
+    }
+</script>
 
 </body>
 </html>
