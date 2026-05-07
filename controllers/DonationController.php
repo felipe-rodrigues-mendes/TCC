@@ -36,6 +36,24 @@ class DonationController {
         return $this->pointDAO->findAllNames(true);
     }
 
+    private function getUserUploadDir(): string {
+        return __DIR__ . '/../assets/uploads/users';
+    }
+
+    private function clearUserProfilePhotos(int $usuarioId): void {
+        $files = glob($this->getUserUploadDir() . '/user_' . $usuarioId . '.*');
+
+        if (!$files) {
+            return;
+        }
+
+        foreach ($files as $file) {
+            if (is_file($file)) {
+                @unlink($file);
+            }
+        }
+    }
+
     private function formatDonationStatusLabel(string $status): string {
         return match (strtolower(trim($status))) {
             'recebida' => 'Recebida',
@@ -217,6 +235,7 @@ class DonationController {
         SessionManager::requireLogin('index.php?page=dashboard');
 
         $usuario_id = SessionManager::getUserId();
+        $usuario = $this->userDAO->findById((int)$usuario_id);
         $doacoes = $this->donationDAO->findByUserId($usuario_id);
         $flash = SessionManager::getMessage();
         $mensagem = $flash['mensagem'] ?? '';
@@ -231,6 +250,99 @@ class DonationController {
         unset($doacao);
 
         include __DIR__ . '/../views/user/dashboard.php';
+    }
+
+    public function updateProfilePhoto(): void {
+        SessionManager::requireLogin('index.php?page=dashboard');
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: index.php?page=dashboard');
+            exit;
+        }
+
+        if (!SessionManager::validateCsrfToken($_POST['csrf_token'] ?? null)) {
+            SessionManager::setMessage('Sua sessão expirou. Atualize a página e tente novamente.', 'erro');
+            header('Location: index.php?page=dashboard');
+            exit;
+        }
+
+        if (!isset($_FILES['foto_perfil']) || !is_array($_FILES['foto_perfil'])) {
+            SessionManager::setMessage('Selecione uma imagem para atualizar sua foto.', 'erro');
+            header('Location: index.php?page=dashboard');
+            exit;
+        }
+
+        $arquivo = $_FILES['foto_perfil'];
+        if ((int)($arquivo['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+            SessionManager::setMessage('Erro no envio da imagem. Tente novamente.', 'erro');
+            header('Location: index.php?page=dashboard');
+            exit;
+        }
+
+        if ((int)($arquivo['size'] ?? 0) > 2 * 1024 * 1024) {
+            SessionManager::setMessage('A imagem deve ter no máximo 2 MB.', 'erro');
+            header('Location: index.php?page=dashboard');
+            exit;
+        }
+
+        $tmpName = (string)($arquivo['tmp_name'] ?? '');
+        $imageInfo = $tmpName !== '' ? @getimagesize($tmpName) : false;
+        $mime = is_array($imageInfo) ? (string)($imageInfo['mime'] ?? '') : '';
+
+        if ($imageInfo === false || !str_starts_with($mime, 'image/') || $mime === 'image/svg+xml') {
+            SessionManager::setMessage('Envie um arquivo de imagem válido.', 'erro');
+            header('Location: index.php?page=dashboard');
+            exit;
+        }
+
+        $extension = image_type_to_extension((int)($imageInfo[2] ?? 0), false);
+        if ($extension === false || $extension === '') {
+            $originalName = strtolower((string)($arquivo['name'] ?? ''));
+            $extension = pathinfo($originalName, PATHINFO_EXTENSION);
+        }
+
+        $extension = strtolower((string)$extension);
+        $extension = preg_replace('/[^a-z0-9]/', '', $extension);
+        if ($extension === '' || $extension === 'svg') {
+            SessionManager::setMessage('Não foi possível identificar o formato da imagem.', 'erro');
+            header('Location: index.php?page=dashboard');
+            exit;
+        }
+
+        $usuarioId = (int)(SessionManager::getUserId() ?? 0);
+        if ($usuarioId <= 0) {
+            SessionManager::setMessage('Usuário inválido para atualizar a foto.', 'erro');
+            header('Location: index.php?page=dashboard');
+            exit;
+        }
+
+        $uploadDir = $this->getUserUploadDir();
+        if (!is_dir($uploadDir) && !mkdir($uploadDir, 0777, true) && !is_dir($uploadDir)) {
+            SessionManager::setMessage('Não foi possível preparar a pasta da foto.', 'erro');
+            header('Location: index.php?page=dashboard');
+            exit;
+        }
+
+        $this->clearUserProfilePhotos($usuarioId);
+        $relativePath = 'assets/uploads/users/user_' . $usuarioId . '.' . $extension;
+        $destination = $uploadDir . '/user_' . $usuarioId . '.' . $extension;
+
+        if (!move_uploaded_file($tmpName, $destination)) {
+            SessionManager::setMessage('Não foi possível salvar a foto de perfil.', 'erro');
+            header('Location: index.php?page=dashboard');
+            exit;
+        }
+
+        if (!$this->userDAO->updateProfilePhoto($usuarioId, $relativePath)) {
+            @unlink($destination);
+            SessionManager::setMessage('Não foi possível atualizar sua foto no cadastro.', 'erro');
+            header('Location: index.php?page=dashboard');
+            exit;
+        }
+
+        SessionManager::setMessage('Foto de perfil atualizada com sucesso.', 'sucesso');
+        header('Location: index.php?page=dashboard');
+        exit;
     }
 
     public function editForm(): void {

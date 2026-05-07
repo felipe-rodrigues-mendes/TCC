@@ -12,6 +12,7 @@ class UserDAO {
 
     public function __construct() {
         $this->conn = Database::getInstance()->getConnection();
+        $this->ensureProfilePhotoColumn();
     }
 
     private function hasUsuarioColumn(string $columnName): bool {
@@ -63,6 +64,20 @@ class UserDAO {
         return $this->hasUsuarioColumn('aceite_termos_lgpd')
             && $this->hasUsuarioColumn('aceite_termos_data')
             && $this->hasUsuarioColumn('aceite_termos_versao');
+    }
+
+    private function ensureProfilePhotoColumn(): bool {
+        if ($this->hasUsuarioColumn('foto_perfil')) {
+            return true;
+        }
+
+        $sql = 'ALTER TABLE usuario ADD COLUMN foto_perfil VARCHAR(255) DEFAULT NULL AFTER telefone';
+        if (!$this->conn->query($sql) && (int)$this->conn->errno !== 1060) {
+            error_log('Erro ao adicionar coluna foto_perfil em usuario: ' . $this->conn->error);
+            return false;
+        }
+
+        return $this->hasUsuarioColumn('foto_perfil');
     }
 
     private function getPerfilIdByNome(string $nome, bool $criarSeNaoExistir = true): ?int {
@@ -123,6 +138,7 @@ class UserDAO {
                 u.nome,
                 u.email,
                 u.telefone,
+                u.foto_perfil,
                 u.ativo,
                 u.id_perfil,
                 p.nome AS perfil_nome,
@@ -169,6 +185,7 @@ class UserDAO {
                 u.nome,
                 u.email,
                 u.telefone,
+                u.foto_perfil,
                 u.ativo,
                 u.id_perfil,
                 p.nome AS perfil_nome,
@@ -416,6 +433,98 @@ class UserDAO {
     }
 
     /**
+     * Atualiza a foto de perfil do usuario.
+     * @param int $usuarioId
+     * @param string $fotoPerfil
+     * @return bool
+     */
+    public function updateProfilePhoto(int $usuarioId, string $fotoPerfil): bool {
+        if ($usuarioId <= 0 || trim($fotoPerfil) === '') {
+            return false;
+        }
+
+        if (!$this->ensureProfilePhotoColumn()) {
+            return false;
+        }
+
+        $sql = 'UPDATE usuario SET foto_perfil = ? WHERE id_usuario = ? AND ativo = 1 LIMIT 1';
+        $stmt = $this->conn->prepare($sql);
+
+        if (!$stmt) {
+            error_log('Erro ao preparar atualizacao da foto de perfil: ' . $this->conn->error);
+            return false;
+        }
+
+        $stmt->bind_param('si', $fotoPerfil, $usuarioId);
+        $executou = $stmt->execute();
+        $afetados = $stmt->affected_rows;
+        $stmt->close();
+
+        return $executou && $afetados >= 0;
+    }
+
+    /**
+     * Desativa e anonimiza a propria conta, preservando historico relacionado.
+     * @param int $usuarioId
+     * @return bool
+     */
+    public function deleteOwnAccount(int $usuarioId): bool {
+        if ($usuarioId <= 0) {
+            return false;
+        }
+
+        $nomeAnonimo = 'Conta excluida';
+        $emailAnonimo = 'conta-excluida-' . $usuarioId . '@anon.local';
+        $telefoneAnonimo = '';
+
+        try {
+            Database::getInstance()->beginTransaction();
+
+            $sqlLogin = 'DELETE FROM login WHERE id_usuario = ?';
+            $stmtLogin = $this->conn->prepare($sqlLogin);
+            if (!$stmtLogin) {
+                throw new Exception('Erro ao preparar remocao de login: ' . $this->conn->error);
+            }
+
+            $stmtLogin->bind_param('i', $usuarioId);
+            if (!$stmtLogin->execute()) {
+                throw new Exception('Erro ao remover login: ' . $stmtLogin->error);
+            }
+            $stmtLogin->close();
+
+            $sqlUsuario = '
+                UPDATE usuario
+                SET nome = ?,
+                    email = ?,
+                    telefone = ?,
+                    foto_perfil = NULL,
+                    ativo = 0
+                WHERE id_usuario = ?
+                LIMIT 1
+            ';
+            $stmtUsuario = $this->conn->prepare($sqlUsuario);
+            if (!$stmtUsuario) {
+                throw new Exception('Erro ao preparar exclusao da conta: ' . $this->conn->error);
+            }
+
+            $stmtUsuario->bind_param('sssi', $nomeAnonimo, $emailAnonimo, $telefoneAnonimo, $usuarioId);
+            if (!$stmtUsuario->execute()) {
+                throw new Exception('Erro ao excluir conta: ' . $stmtUsuario->error);
+            }
+
+            $afetados = $stmtUsuario->affected_rows;
+            $stmtUsuario->close();
+
+            Database::getInstance()->commit();
+            return $afetados >= 0;
+        } catch (Exception $e) {
+            Database::getInstance()->rollback();
+            error_log('Erro ao excluir propria conta: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
      * Retorna usuários com perfil específico.
      * @param string $tipo 'admin' ou 'doador'
      * @return array
@@ -428,6 +537,7 @@ class UserDAO {
                 u.nome,
                 u.email,
                 u.telefone,
+                u.foto_perfil,
                 u.ativo,
                 u.id_perfil,
                 p.nome AS perfil_nome,
@@ -472,6 +582,7 @@ class UserDAO {
                 u.nome,
                 u.email,
                 u.telefone,
+                u.foto_perfil,
                 u.ativo,
                 u.id_perfil,
                 p.nome AS perfil_nome,

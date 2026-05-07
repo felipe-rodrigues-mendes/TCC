@@ -38,6 +38,7 @@ $routes = [
     'login' => ['AuthController', 'login'],
     'register' => ['AuthController', 'register'],
     'forgot_password' => ['AuthController', 'forgotPassword'],
+    'account_delete' => ['AuthController', 'deleteAccount'],
     'logout' => ['AuthController', 'logout'],
     
     // Rotas de doações
@@ -47,6 +48,7 @@ $routes = [
     'donation_update' => ['DonationController', 'update'],
     'donation_cancel' => ['DonationController', 'cancel'],
     'donation_receipt' => ['DonationController', 'receipt'],
+    'profile_photo_update' => ['DonationController', 'updateProfilePhoto'],
     'dashboard' => ['DonationController', 'dashboard'],
     
     // Rotas administrativas

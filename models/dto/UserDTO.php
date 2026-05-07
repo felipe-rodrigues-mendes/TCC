@@ -18,6 +18,7 @@ class UserDTO {
     public string $senha_hash;
     public string $ultimo_acesso;
     public string $perfil_nome;
+    public string $foto_perfil;
 
     public function __construct(
         int $id = 0,
@@ -30,7 +31,8 @@ class UserDTO {
         string $username = "",
         string $senha_hash = "",
         string $ultimo_acesso = "",
-        string $perfil_nome = ""
+        string $perfil_nome = "",
+        string $foto_perfil = ""
     ) {
         $this->id = $id;
         $this->id_usuario = $id;
@@ -45,6 +47,7 @@ class UserDTO {
         $this->senha_hash = $senha_hash;
         $this->ultimo_acesso = $ultimo_acesso;
         $this->perfil_nome = $perfil_nome;
+        $this->foto_perfil = $foto_perfil;
     }
 
     /**
@@ -67,7 +70,8 @@ class UserDTO {
             (string)($data['username'] ?? ''),
             $senhaHash,
             (string)($data['ultimo_acesso'] ?? ''),
-            $perfil
+            $perfil,
+            (string)($data['foto_perfil'] ?? '')
         );
     }
 
