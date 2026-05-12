@@ -59,6 +59,97 @@
             margin-bottom: 24px;
             line-height: 1.5;
         }
+
+        .password-input-wrapper {
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .password-input-wrapper input {
+            margin-bottom: 0;
+            padding-right: 44px;
+        }
+
+        .password-toggle {
+            position: absolute;
+            top: 50%;
+            right: 12px;
+            transform: translateY(-50%);
+            border: 0;
+            background: transparent;
+            color: #2563eb;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .password-toggle i {
+            font-size: 16px;
+        }
+
+        .password-toggle:hover {
+            color: #1d4ed8;
+        }
+
+        .password-checklist {
+            margin: 8px 0 16px;
+        }
+
+        .password-checklist-title {
+            margin: 0 0 8px;
+            font-size: 14px;
+            text-align: left;
+            color: #1e3a8a;
+            font-weight: 700;
+        }
+
+        .password-checklist-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .password-checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: left;
+        }
+
+        .password-checklist-item i {
+            width: 16px;
+        }
+
+        .password-checklist-item.invalid {
+            color: #b91c1c;
+        }
+
+        .password-checklist-item.valid {
+            color: #15803d;
+        }
+
+        [data-theme="dark"] .password-toggle {
+            color: #93c5fd;
+        }
+
+        [data-theme="dark"] .password-toggle:hover {
+            color: #bfdbfe;
+        }
+
+        [data-theme="dark"] .password-checklist-title {
+            color: #93c5fd;
+        }
+
+        [data-theme="dark"] .password-checklist-item.invalid {
+            color: #fca5a5;
+        }
+
+        [data-theme="dark"] .password-checklist-item.valid {
+            color: #86efac;
+        }
     </style>
 </head>
 <body>
@@ -83,10 +174,46 @@
             <input type="email" name="email" id="email" required>
 
             <label for="nova_senha">Nova senha</label>
-            <input type="password" name="nova_senha" id="nova_senha" required minlength="6">
+            <div class="password-input-wrapper">
+                <input type="password" name="nova_senha" id="nova_senha" required minlength="8" maxlength="70" autocomplete="new-password" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,70}" title="Use de 8 a 70 caracteres com letra mai&uacute;scula, min&uacute;scula, n&uacute;mero e caractere especial (ex.: ! @ # $ % &amp; *)." aria-describedby="password-checklist">
+                <button type="button" class="password-toggle" data-target="nova_senha" aria-label="Mostrar senha">
+                    <i class="fa-solid fa-eye" aria-hidden="true"></i>
+                </button>
+            </div>
+
+            <div class="password-checklist" id="password-checklist" aria-live="polite">
+                <p class="password-checklist-title">Sua senha deve conter:</p>
+                <ul class="password-checklist-list">
+                    <li class="password-checklist-item invalid" id="password-rule-length">
+                        <i class="fa-solid fa-circle-xmark" aria-hidden="true"></i>
+                        <span>de 8 a 70 caracteres</span>
+                    </li>
+                    <li class="password-checklist-item invalid" id="password-rule-lower">
+                        <i class="fa-solid fa-circle-xmark" aria-hidden="true"></i>
+                        <span>letra min&uacute;scula</span>
+                    </li>
+                    <li class="password-checklist-item invalid" id="password-rule-upper">
+                        <i class="fa-solid fa-circle-xmark" aria-hidden="true"></i>
+                        <span>letra mai&uacute;scula</span>
+                    </li>
+                    <li class="password-checklist-item invalid" id="password-rule-number">
+                        <i class="fa-solid fa-circle-xmark" aria-hidden="true"></i>
+                        <span>n&uacute;mero</span>
+                    </li>
+                    <li class="password-checklist-item invalid" id="password-rule-special">
+                        <i class="fa-solid fa-circle-xmark" aria-hidden="true"></i>
+                        <span>s&iacute;mbolo (ex.: ! @ # $ % &amp; *)</span>
+                    </li>
+                </ul>
+            </div>
 
             <label for="confirmar_senha">Confirmar nova senha</label>
-            <input type="password" name="confirmar_senha" id="confirmar_senha" required minlength="6">
+            <div class="password-input-wrapper">
+                <input type="password" name="confirmar_senha" id="confirmar_senha" required minlength="8" maxlength="70" autocomplete="new-password">
+                <button type="button" class="password-toggle" data-target="confirmar_senha" aria-label="Mostrar senha">
+                    <i class="fa-solid fa-eye" aria-hidden="true"></i>
+                </button>
+            </div>
 
             <button type="submit">Salvar nova senha</button>
         </form>
@@ -99,6 +226,98 @@
     <p>© 2026 ConectaSolidária</p>
 </footer>
 
+<script>
+    (function () {
+        const senhaInput = document.getElementById('nova_senha');
+        const rules = [
+            {
+                element: document.getElementById('password-rule-length'),
+                test: function (value) {
+                    return value.length >= 8 && value.length <= 70;
+                }
+            },
+            {
+                element: document.getElementById('password-rule-lower'),
+                test: function (value) {
+                    return /[a-z]/.test(value);
+                }
+            },
+            {
+                element: document.getElementById('password-rule-upper'),
+                test: function (value) {
+                    return /[A-Z]/.test(value);
+                }
+            },
+            {
+                element: document.getElementById('password-rule-number'),
+                test: function (value) {
+                    return /\d/.test(value);
+                }
+            },
+            {
+                element: document.getElementById('password-rule-special'),
+                test: function (value) {
+                    return /[^A-Za-z0-9]/.test(value);
+                }
+            }
+        ];
+
+        function updateRuleState(element, isValid) {
+            if (!element) {
+                return;
+            }
+
+            element.classList.toggle('valid', isValid);
+            element.classList.toggle('invalid', !isValid);
+
+            const icon = element.querySelector('i');
+            if (!icon) {
+                return;
+            }
+
+            icon.classList.toggle('fa-circle-check', isValid);
+            icon.classList.toggle('fa-circle-xmark', !isValid);
+        }
+
+        function refreshPasswordRules() {
+            if (!senhaInput) {
+                return;
+            }
+
+            const value = senhaInput.value;
+            rules.forEach(function (rule) {
+                updateRuleState(rule.element, rule.test(value));
+            });
+        }
+
+        if (senhaInput) {
+            senhaInput.addEventListener('input', refreshPasswordRules);
+            refreshPasswordRules();
+        }
+
+        document.querySelectorAll('.password-toggle').forEach(function (button) {
+            const targetId = button.getAttribute('data-target');
+            const targetInput = document.getElementById(targetId);
+
+            if (!targetInput) {
+                return;
+            }
+
+            button.addEventListener('click', function () {
+                const showPassword = targetInput.type === 'password';
+                targetInput.type = showPassword ? 'text' : 'password';
+
+                const icon = button.querySelector('i');
+                if (icon) {
+                    icon.classList.toggle('fa-eye', !showPassword);
+                    icon.classList.toggle('fa-eye-slash', showPassword);
+                }
+
+                button.setAttribute('aria-label', showPassword ? 'Ocultar senha' : 'Mostrar senha');
+            });
+        });
+    })();
+</script>
+
 </body>
 </html>
-
