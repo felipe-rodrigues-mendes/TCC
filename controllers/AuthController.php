@@ -177,8 +177,8 @@ class AuthController {
             if ($email === '' || $novaSenha === '' || $confirmacaoSenha === '') {
                 $mensagem = 'Preencha e-mail, nova senha e confirmação.';
                 $tipoMensagem = 'erro';
-            } elseif (strlen($novaSenha) < 6) {
-                $mensagem = 'A nova senha deve ter no mínimo 6 caracteres.';
+            } elseif (($erroSenha = $this->getPasswordPolicyError($novaSenha)) !== '') {
+                $mensagem = $erroSenha;
                 $tipoMensagem = 'erro';
             } elseif ($novaSenha !== $confirmacaoSenha) {
                 $mensagem = 'A confirmação da senha não confere.';
