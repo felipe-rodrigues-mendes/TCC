@@ -172,7 +172,7 @@ class DestinationDAO {
 
     private function setActiveStatus(int $destinoId, int $activeValue): bool {
         if (!$this->supportsActiveColumn) {
-            error_log('A coluna ativo nao esta disponivel em destino.');
+            error_log('A coluna ativo não está disponível em destino.');
             return false;
         }
 

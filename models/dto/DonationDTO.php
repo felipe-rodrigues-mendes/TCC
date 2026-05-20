@@ -2,7 +2,7 @@
 
 /**
  * Data Transfer Object para dados de doação.
- * Compatível com o schema atual: doacao + item_doacao.
+ * Compatível com o schema atual: doação + item_doacao.
  */
 class DonationDTO {
     public int $id;

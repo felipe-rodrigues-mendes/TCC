@@ -5,7 +5,7 @@ require_once __DIR__ . '/../dto/DonationDTO.php';
 
 /**
  * Data Access Object para gerenciar operações de doações no banco de dados.
- * Compatível com o schema atual: doacao + item_doacao.
+ * Compatível com o schema atual: doação + item_doacao.
  */
 class DonationDAO {
     private $conn;

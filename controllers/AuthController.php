@@ -196,7 +196,7 @@ class AuthController {
     }
 
     /**
-     * Exclui a propria conta do usuario autenticado.
+     * Exclui a própria conta do usuário autenticado.
      */
     public function deleteAccount(): void {
         SessionManager::requireLogin('index.php?page=dashboard');

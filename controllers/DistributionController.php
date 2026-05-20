@@ -9,7 +9,7 @@ require_once __DIR__ . '/../models/Database.php';
 require_once __DIR__ . '/SessionManager.php';
 
 /**
- * Controller para gerenciar distribuicoes administrativas.
+ * Controller para gerenciar distribuições administrativas.
  */
 class DistributionController {
     private $distributionDAO;
@@ -40,7 +40,7 @@ class DistributionController {
 
         $normalized = strtolower($normalized);
 
-        // Remove separadores para comparacoes estaveis.
+        // Remove separadores para comparações estáveis.
         return preg_replace('/[^a-z0-9]+/', '', $normalized) ?? '';
     }
 
@@ -78,7 +78,7 @@ class DistributionController {
             return;
         }
 
-        $this->redirectWithMessage('Sua sessao expirou. Atualize a pagina e tente novamente.');
+        $this->redirectWithMessage('Sua sessão expirou. Atualize a página e tente novamente.');
     }
 
     public function manage(): void {
@@ -134,7 +134,7 @@ class DistributionController {
         $cep = trim((string)($_POST['novo_destino_cep'] ?? ''));
 
         if ($nome === '' || $logradouro === '' || $cidade === '' || $estado === '' || $cep === '') {
-            $this->redirectWithMessage('Preencha todos os campos para cadastrar a instituicao de caridade.');
+            $this->redirectWithMessage('Preencha todos os campos para cadastrar a instituição de caridade.');
         }
 
         $destinoExistente = $this->destinationDAO->findByIdentity($nome, $logradouro, $cidade, $estado, $cep);
@@ -143,18 +143,18 @@ class DistributionController {
             $destinoExistenteAtivo = ((int)($destinoExistente['ativo'] ?? 1)) === 1;
 
             if ($destinoExistenteAtivo) {
-                $this->redirectWithMessage('Essa instituicao ja esta cadastrada como destino ativo.');
+                $this->redirectWithMessage('Essa instituição já está cadastrada como destino ativo.');
             }
 
             if ($destinoExistenteId <= 0) {
-                $this->redirectWithMessage('Nao foi possivel reativar a instituicao informada.');
+                $this->redirectWithMessage('Não foi possível reativar a instituição informada.');
             }
 
             if (!$this->destinationDAO->activate($destinoExistenteId)) {
-                $this->redirectWithMessage('Nao foi possivel reativar a instituicao informada.');
+                $this->redirectWithMessage('Não foi possível reativar a instituição informada.');
             }
 
-            $this->redirectWithMessage('Instituicao reativada e liberada para novas distribuicoes.', 'sucesso');
+            $this->redirectWithMessage('Instituição reativada e liberada para novas distribuições.', 'sucesso');
         }
 
         try {
@@ -162,14 +162,14 @@ class DistributionController {
 
             $destinoId = $this->destinationDAO->create($nome, $logradouro, $cidade, $estado, $cep);
             if ($destinoId === null) {
-                throw new Exception('Nao foi possivel cadastrar a instituicao informada.');
+                throw new Exception('Não foi possível cadastrar a instituição informada.');
             }
 
             Database::getInstance()->commit();
-            $this->redirectWithMessage('Instituicao de caridade cadastrada com sucesso.', 'sucesso');
+            $this->redirectWithMessage('Instituição de caridade cadastrada com sucesso.', 'sucesso');
         } catch (Exception $e) {
             Database::getInstance()->rollback();
-            $this->redirectWithMessage('Erro ao cadastrar instituicao: ' . $e->getMessage());
+            $this->redirectWithMessage('Erro ao cadastrar instituição: ' . $e->getMessage());
         }
     }
 
@@ -179,47 +179,47 @@ class DistributionController {
 
         $destinoId = (int)($_POST['destino_id'] ?? 0);
         if ($destinoId <= 0) {
-            $this->redirectWithMessage('Instituicao invalida.');
+            $this->redirectWithMessage('Instituição inválida.');
         }
 
         $novoStatus = strtolower(trim((string)($_POST['novo_status'] ?? '')));
         if ($novoStatus === '' && isset($_POST['excluir_destino'])) {
-            // Compatibilidade com o nome antigo do formulario.
+            // Compatibilidade com o nome antigo do formulário.
             $novoStatus = 'desativar';
         }
 
         if (!in_array($novoStatus, ['ativar', 'desativar'], true)) {
-            $this->redirectWithMessage('Acao de status invalida para a instituicao.');
+            $this->redirectWithMessage('Ação de status inválida para a instituição.');
         }
 
         $destino = $this->destinationDAO->findById($destinoId);
         if ($destino === null) {
-            $this->redirectWithMessage('Instituicao nao encontrada.');
+            $this->redirectWithMessage('Instituição não encontrada.');
         }
 
         $estaAtivo = ((int)($destino['ativo'] ?? 1)) === 1;
 
         if ($novoStatus === 'ativar') {
             if ($estaAtivo) {
-                $this->redirectWithMessage('A instituicao ja esta ativa.', 'sucesso');
+                $this->redirectWithMessage('A instituição já está ativa.', 'sucesso');
             }
 
             if (!$this->destinationDAO->activate($destinoId)) {
-                $this->redirectWithMessage('Nao foi possivel ativar a instituicao selecionada.');
+                $this->redirectWithMessage('Não foi possível ativar a instituição selecionada.');
             }
 
-            $this->redirectWithMessage('Instituicao ativada com sucesso.', 'sucesso');
+            $this->redirectWithMessage('Instituição ativada com sucesso.', 'sucesso');
         }
 
         if (!$estaAtivo) {
-            $this->redirectWithMessage('A instituicao ja esta inativa.', 'sucesso');
+            $this->redirectWithMessage('A instituição já está inativa.', 'sucesso');
         }
 
         if (!$this->destinationDAO->deactivate($destinoId)) {
-            $this->redirectWithMessage('Nao foi possivel desativar a instituicao selecionada.');
+            $this->redirectWithMessage('Não foi possível desativar a instituição selecionada.');
         }
 
-        $this->redirectWithMessage('Instituicao desativada com sucesso.', 'sucesso');
+        $this->redirectWithMessage('Instituição desativada com sucesso.', 'sucesso');
     }
 
     public function store(): void {
@@ -240,23 +240,23 @@ class DistributionController {
         $allowedPontos = $this->getAllowedStockPoints();
         $allowedPointIds = array_map('intval', array_column($allowedPontos, 'id'));
         if (!in_array($pontoId, $allowedPointIds, true)) {
-            $this->redirectWithMessage('O ponto de estoque selecionado nao esta disponivel para distribuicao.');
+            $this->redirectWithMessage('O ponto de estoque selecionado não está disponível para distribuição.');
         }
 
         if ($campanhaId <= 0) {
-            $this->redirectWithMessage('Selecione a campanha/cidade dessa distribuicao.');
+            $this->redirectWithMessage('Selecione a campanha/cidade dessa distribuição.');
         }
 
         if ($destinoId <= 0) {
-            $this->redirectWithMessage('Selecione a instituicao de caridade cadastrada para a entrega.');
+            $this->redirectWithMessage('Selecione a instituição de caridade cadastrada para a entrega.');
         }
 
         if (!$this->destinationDAO->existsActive($destinoId)) {
-            $this->redirectWithMessage('A instituicao selecionada nao esta disponivel para novas entregas.');
+            $this->redirectWithMessage('A instituição selecionada não está disponível para novas entregas.');
         }
 
         if (empty($itensSelecionados)) {
-            $this->redirectWithMessage('Selecione ao menos um item para distribuicao.');
+            $this->redirectWithMessage('Selecione ao menos um item para distribuição.');
         }
 
         $estoqueDisponivel = [];
@@ -273,15 +273,15 @@ class DistributionController {
             $quantidade = isset($quantidades[$categoriaId]) ? (int)$quantidades[$categoriaId] : 0;
 
             if ($categoriaId <= 0 || $quantidade <= 0) {
-                $this->redirectWithMessage('Informe quantidades validas para cada item selecionado.');
+                $this->redirectWithMessage('Informe quantidades válidas para cada item selecionado.');
             }
 
             if (!isset($estoqueDisponivel[$categoriaId])) {
-                $this->redirectWithMessage('Um dos itens selecionados nao existe no estoque do ponto informado.');
+                $this->redirectWithMessage('Um dos itens selecionados não existe no estoque do ponto informado.');
             }
 
             if ($quantidade > $estoqueDisponivel[$categoriaId]['quantidade']) {
-                $this->redirectWithMessage('A quantidade solicitada excede o estoque disponivel para um dos itens.');
+                $this->redirectWithMessage('A quantidade solicitada excede o estoque disponível para um dos itens.');
             }
 
             $itens[$categoriaId] = $quantidade;
@@ -297,10 +297,10 @@ class DistributionController {
             }
 
             Database::getInstance()->commit();
-            $this->redirectWithMessage('Distribuicao registrada com sucesso e estoque atualizado.', 'sucesso');
+            $this->redirectWithMessage('Distribuição registrada com sucesso e estoque atualizado.', 'sucesso');
         } catch (Exception $e) {
             Database::getInstance()->rollback();
-            $this->redirectWithMessage('Erro ao registrar distribuicao: ' . $e->getMessage());
+            $this->redirectWithMessage('Erro ao registrar distribuição: ' . $e->getMessage());
         }
     }
 
@@ -310,13 +310,13 @@ class DistributionController {
 
         $distribuicaoId = (int)($_POST['distribuicao_id'] ?? 0);
         if ($distribuicaoId <= 0) {
-            $this->redirectWithMessage('Distribuicao invalida.');
+            $this->redirectWithMessage('Distribuição inválida.');
         }
 
         if ($this->distributionDAO->updateStatus($distribuicaoId, 'ENTREGUE')) {
-            $this->redirectWithMessage('Distribuicao marcada como entregue.', 'sucesso');
+            $this->redirectWithMessage('Distribuição marcada como entregue.', 'sucesso');
         }
 
-        $this->redirectWithMessage('Nao foi possivel atualizar o status da distribuicao.');
+        $this->redirectWithMessage('Não foi possível atualizar o status da distribuição.');
     }
 }

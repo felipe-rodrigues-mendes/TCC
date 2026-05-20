@@ -266,7 +266,7 @@ class AdminController {
         }
 
         if (!SessionManager::validateCsrfToken($_POST['csrf_token'] ?? null)) {
-            $this->redirectToCollectionPointsWithMessage('Sua sessao expirou. Atualize a pagina e tente novamente.');
+            $this->redirectToCollectionPointsWithMessage('Sua sessão expirou. Atualize a página e tente novamente.');
         }
 
         $nome = trim((string)($_POST['novo_ponto_nome'] ?? ''));
@@ -285,11 +285,11 @@ class AdminController {
             $pontoExistenteAtivo = ((int)($pontoExistente['ativo'] ?? 1)) === 1;
 
             if ($pontoExistenteAtivo) {
-                $this->redirectToCollectionPointsWithMessage('Esse ponto ja esta cadastrado como ativo.');
+                $this->redirectToCollectionPointsWithMessage('Esse ponto já está cadastrado como ativo.');
             }
 
             if ($pontoExistenteId <= 0 || !$this->pointDAO->activate($pontoExistenteId)) {
-                $this->redirectToCollectionPointsWithMessage('Nao foi possivel reativar o ponto informado.');
+                $this->redirectToCollectionPointsWithMessage('Não foi possível reativar o ponto informado.');
             }
 
             $this->redirectToCollectionPointsWithMessage('Ponto reativado com sucesso.', 'sucesso');
@@ -300,7 +300,7 @@ class AdminController {
 
             $pointId = $this->pointDAO->create($nome, $logradouro, $cidade, $estado, $cep);
             if ($pointId === null) {
-                throw new Exception('Nao foi possivel cadastrar o ponto informado.');
+                throw new Exception('Não foi possível cadastrar o ponto informado.');
             }
 
             Database::getInstance()->commit();
@@ -323,44 +323,44 @@ class AdminController {
         }
 
         if (!SessionManager::validateCsrfToken($_POST['csrf_token'] ?? null)) {
-            $this->redirectToCollectionPointsWithMessage('Sua sessao expirou. Atualize a pagina e tente novamente.');
+            $this->redirectToCollectionPointsWithMessage('Sua sessão expirou. Atualize a página e tente novamente.');
         }
 
         $pointId = (int)($_POST['ponto_id'] ?? 0);
         if ($pointId <= 0) {
-            $this->redirectToCollectionPointsWithMessage('Ponto de coleta invalido.');
+            $this->redirectToCollectionPointsWithMessage('Ponto de coleta inválido.');
         }
 
         $novoStatus = strtolower(trim((string)($_POST['novo_status'] ?? '')));
         if (!in_array($novoStatus, ['ativar', 'desativar'], true)) {
-            $this->redirectToCollectionPointsWithMessage('Acao de status invalida para o ponto de coleta.');
+            $this->redirectToCollectionPointsWithMessage('Ação de status inválida para o ponto de coleta.');
         }
 
         $ponto = $this->pointDAO->findById($pointId);
         if ($ponto === null) {
-            $this->redirectToCollectionPointsWithMessage('Ponto de coleta nao encontrado.');
+            $this->redirectToCollectionPointsWithMessage('Ponto de coleta não encontrado.');
         }
 
         $estaAtivo = ((int)($ponto['ativo'] ?? 1)) === 1;
 
         if ($novoStatus === 'ativar') {
             if ($estaAtivo) {
-                $this->redirectToCollectionPointsWithMessage('O ponto de coleta ja esta ativo.', 'sucesso');
+                $this->redirectToCollectionPointsWithMessage('O ponto de coleta já está ativo.', 'sucesso');
             }
 
             if (!$this->pointDAO->activate($pointId)) {
-                $this->redirectToCollectionPointsWithMessage('Nao foi possivel ativar o ponto selecionado.');
+                $this->redirectToCollectionPointsWithMessage('Não foi possível ativar o ponto selecionado.');
             }
 
             $this->redirectToCollectionPointsWithMessage('Ponto de coleta ativado com sucesso.', 'sucesso');
         }
 
         if (!$estaAtivo) {
-            $this->redirectToCollectionPointsWithMessage('O ponto de coleta ja esta inativo.', 'sucesso');
+            $this->redirectToCollectionPointsWithMessage('O ponto de coleta já está inativo.', 'sucesso');
         }
 
         if (!$this->pointDAO->deactivate($pointId)) {
-            $this->redirectToCollectionPointsWithMessage('Nao foi possivel desativar o ponto selecionado.');
+            $this->redirectToCollectionPointsWithMessage('Não foi possível desativar o ponto selecionado.');
         }
 
         $this->redirectToCollectionPointsWithMessage('Ponto de coleta desativado com sucesso.', 'sucesso');

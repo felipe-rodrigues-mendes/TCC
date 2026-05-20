@@ -394,7 +394,7 @@ SessionManager::requireRole('admin');
                                     </div>
                                 </div>
                                 <span class="status-badge <?php echo htmlspecialchars($distribuicao['status']); ?>">
-                                    <?php echo ucfirst($distribuicao['status']); ?>
+                                    <?php echo ['enviado' => 'Enviado', 'entregue' => 'Entregue'][strtolower((string)$distribuicao['status'])] ?? ucfirst(strtolower((string)$distribuicao['status'])); ?>
                                 </span>
                             </div>
 

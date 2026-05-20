@@ -422,7 +422,7 @@ SessionManager::requireRole('admin');
                                 <td><?php echo date('d/m/Y', strtotime($doacao['data_criacao'])); ?></td>
                                 <td>
                                     <span class="status-badge <?php echo $doacao['status']; ?>">
-                                        <?php echo ucfirst($doacao['status']); ?>
+                                        <?php echo ['pendente' => 'Pendente', 'recebida' => 'Recebida', 'excluida' => 'Excluída'][$doacao['status']] ?? ucfirst($doacao['status']); ?>
                                     </span>
                                 </td>
                                 <td>

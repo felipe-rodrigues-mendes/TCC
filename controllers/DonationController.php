@@ -13,7 +13,7 @@ require_once __DIR__ . '/SessionManager.php';
 
 /**
  * Controller para gerenciar operações de doação.
- * Compatível com o schema atual: doacao + item_doacao.
+ * Compatível com o schema atual: doação + item_doacao.
  */
 class DonationController {
     private $donationDAO;
