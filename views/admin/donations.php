@@ -147,6 +147,32 @@ SessionManager::requireRole('admin');
             background: #15803d;
         }
 
+        .donation-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-pdf {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: #2563eb;
+            color: white;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .btn-pdf:hover {
+            background: #1d4ed8;
+            color: white;
+        }
+
         .mensagem {
             margin-bottom: 15px;
             padding: 12px;
@@ -422,10 +448,20 @@ SessionManager::requireRole('admin');
                                 <td><?php echo date('d/m/Y', strtotime($doacao['data_criacao'])); ?></td>
                                 <td>
                                     <span class="status-badge <?php echo $doacao['status']; ?>">
-                                        <?php echo ucfirst($doacao['status']); ?>
+                                        <?php echo ['pendente' => 'Pendente', 'recebida' => 'Recebida', 'excluida' => 'Excluída'][$doacao['status']] ?? ucfirst($doacao['status']); ?>
                                     </span>
                                 </td>
                                 <td>
+                                    <div class="donation-actions">
+                                        <a
+                                            href="index.php?page=donation_receipt&id=<?php echo (int)$doacao['id']; ?>"
+                                            class="btn-pdf"
+                                            target="_blank"
+                                            rel="noopener"
+                                        >
+                                            <i class="fas fa-file-pdf"></i> Ver PDF
+                                        </a>
+
                                     <?php if ($doacao['status'] === 'pendente'): ?>
                                         <form method="POST" action="index.php?page=admin_receive_donation" class="form-receber form-receber-inline">
                                             <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(SessionManager::getCsrfToken()); ?>">
@@ -439,6 +475,7 @@ SessionManager::requireRole('admin');
                                     <?php else: ?>
                                         <span class="status-recebida">Recebida</span>
                                     <?php endif; ?>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

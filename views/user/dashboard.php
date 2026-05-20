@@ -645,7 +645,7 @@ $fotoPerfilUrl = ($fotoPerfilPath !== '' && is_file($fotoPerfilPath))
                         <div class="info-doacao">
                             <strong>Status:</strong>
                             <span class="status-badge <?php echo $doacao->status; ?>">
-                                <?php echo ucfirst($doacao->status); ?>
+                                <?php echo ['pendente' => 'Pendente', 'recebida' => 'Recebida', 'excluida' => 'Excluída'][$doacao->status] ?? ucfirst($doacao->status); ?>
                             </span>
                         </div>
 

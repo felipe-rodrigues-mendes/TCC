@@ -13,7 +13,7 @@ $totalCidadesContato = isset($totalCidadesContato) ? (int)$totalCidadesContato :
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contato - ConectaSolidaria</title>
+    <title>Contato - ConectaSolidária</title>
     <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico?v=3">
     <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon.png?v=2">
     <link rel="stylesheet" href="assets/css/style.css?v=<?= time(); ?>">
@@ -26,10 +26,10 @@ $totalCidadesContato = isset($totalCidadesContato) ? (int)$totalCidadesContato :
 <main>
     <section class="contact-page">
         <header class="contact-hero">
-            <p class="contact-eyebrow">Atendimento ConectaSolidaria</p>
-            <h1>Contato e Localizacao</h1>
+            <p class="contact-eyebrow">Atendimento ConectaSolidária</p>
+            <h1>Contato e Localização</h1>
             <p class="contact-subtitle">
-                Fale com nossa equipe e veja no mapa os pontos oficiais para entrega de doacoes.
+                Fale com nossa equipe e veja no mapa os pontos oficiais para entrega de doações.
             </p>
 
             <div class="contact-stats">
@@ -51,7 +51,7 @@ $totalCidadesContato = isset($totalCidadesContato) ? (int)$totalCidadesContato :
                 </div>
                 <div class="contact-channel-body">
                     <h2>WhatsApp</h2>
-                    <p>Atendimento rapido para duvidas sobre doacao e entrega.</p>
+                    <p>Atendimento rápido para dúvidas sobre doação e entrega.</p>
                     <a href="https://wa.me/5561986810428" target="_blank" rel="noopener noreferrer">
                         (61) 98681-0428
                     </a>
@@ -64,7 +64,7 @@ $totalCidadesContato = isset($totalCidadesContato) ? (int)$totalCidadesContato :
                 </div>
                 <div class="contact-channel-body">
                     <h2>E-mail</h2>
-                    <p>Envie solicitacoes, parcerias e comunicacoes institucionais.</p>
+                    <p>Envie solicitações, parcerias e comunicações institucionais.</p>
                     <a href="mailto:ConectaSolidaria@gmail.com">ConectaSolidaria@gmail.com</a>
                 </div>
             </article>
@@ -74,9 +74,9 @@ $totalCidadesContato = isset($totalCidadesContato) ? (int)$totalCidadesContato :
                     <i class="fas fa-clock"></i>
                 </div>
                 <div class="contact-channel-body">
-                    <h2>Horario de atendimento</h2>
+                    <h2>Horário de atendimento</h2>
                     <p>Atendimento presencial nos pontos oficiais.</p>
-                    <strong>Segunda a sabado, das 8h as 22h</strong>
+                    <strong>Segunda a sábado, das 8h às 22h</strong>
                 </div>
             </article>
         </section>
@@ -84,7 +84,7 @@ $totalCidadesContato = isset($totalCidadesContato) ? (int)$totalCidadesContato :
         <?php if (empty($pontosContato)): ?>
             <div class="contact-empty">
                 <p><i class="fas fa-info-circle"></i> Nenhum ponto oficial foi encontrado no momento.</p>
-                <a class="contact-empty-action" href="index.php?page=collection_points">Ver pagina de pontos</a>
+                <a class="contact-empty-action" href="index.php?page=collection_points">Ver página de pontos</a>
             </div>
         <?php else: ?>
             <section class="contact-point-grid" aria-label="Pontos com mapa">
@@ -135,7 +135,7 @@ $totalCidadesContato = isset($totalCidadesContato) ? (int)$totalCidadesContato :
                             <?php endif; ?>
                             <a class="contact-point-action" href="index.php?page=donation_create">
                                 <i class="fas fa-hand-holding-heart"></i>
-                                Entregar doacao
+                                Entregar doação
                             </a>
                         </div>
 
@@ -157,7 +157,7 @@ $totalCidadesContato = isset($totalCidadesContato) ? (int)$totalCidadesContato :
 </main>
 
 <footer>
-    <p>© 2026 ConectaSolidaria</p>
+    <p>&copy; 2026 ConectaSolidária</p>
 </footer>
 
 </body>

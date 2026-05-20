@@ -464,7 +464,7 @@ class UserDAO {
     }
 
     /**
-     * Desativa e anonimiza a propria conta, preservando historico relacionado.
+     * Desativa e anonimiza a própria conta, preservando histórico relacionado.
      * @param int $usuarioId
      * @return bool
      */
@@ -473,7 +473,7 @@ class UserDAO {
             return false;
         }
 
-        $nomeAnonimo = 'Conta excluida';
+        $nomeAnonimo = 'Conta excluída';
         $emailAnonimo = 'conta-excluida-' . $usuarioId . '@anon.local';
         $telefoneAnonimo = '';
 
@@ -519,7 +519,7 @@ class UserDAO {
             return $afetados >= 0;
         } catch (Exception $e) {
             Database::getInstance()->rollback();
-            error_log('Erro ao excluir propria conta: ' . $e->getMessage());
+            error_log('Erro ao excluir própria conta: ' . $e->getMessage());
             return false;
         }
     }

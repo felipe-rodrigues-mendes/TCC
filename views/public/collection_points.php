@@ -14,7 +14,7 @@ $totalCidades = isset($totalCidades) ? (int)$totalCidades : count($cidadesDispon
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pontos de Coleta - ConectaSolidaria</title>
+    <title>Pontos de Coleta - ConectaSolidária</title>
     <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico?v=3">
     <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon.png?v=2">
     <link rel="stylesheet" href="assets/css/style.css?v=<?= time(); ?>">
@@ -30,7 +30,7 @@ $totalCidades = isset($totalCidades) ? (int)$totalCidades : count($cidadesDispon
             <p class="collection-eyebrow">Rede oficial de recebimento</p>
             <h1>Pontos de Coleta</h1>
             <p class="collection-subtitle">
-                Encontre o local mais proximo para entregar sua doacao com seguranca e rastreabilidade.
+                Encontre o local mais próximo para entregar sua doação com segurança e rastreabilidade.
             </p>
 
             <div class="collection-stats">
@@ -47,7 +47,7 @@ $totalCidades = isset($totalCidades) ? (int)$totalCidades : count($cidadesDispon
             <div class="collection-hero-actions">
                 <a class="btn-primary" href="index.php?page=donation_create">
                     <i class="fas fa-hand-holding-heart"></i>
-                    Fazer uma doacao
+                    Fazer uma doação
                 </a>
                 <a class="collection-link" href="index.php?page=contact">
                     Ver contatos da rede
@@ -149,7 +149,7 @@ $totalCidades = isset($totalCidades) ? (int)$totalCidades : count($cidadesDispon
 
                             <a class="collection-action" href="index.php?page=donation_create">
                                 <i class="fas fa-box-open"></i>
-                                Entregar doacao
+                                Entregar doação
                             </a>
                         </div>
 
@@ -171,7 +171,7 @@ $totalCidades = isset($totalCidades) ? (int)$totalCidades : count($cidadesDispon
 </main>
 
 <footer>
-    <p>© 2026 ConectaSolidaria</p>
+    <p>&copy; 2026 ConectaSolidária</p>
 </footer>
 
 </body>

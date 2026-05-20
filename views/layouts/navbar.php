@@ -1,6 +1,6 @@
 <?php
 // Navbar compartilhada - refatorada de menu.php
-// Esta navbar e incluida em todas as paginas via layout base
+// Esta navbar é incluída em todas as páginas via layout base
 SessionManager::start();
 $isAuthenticated = SessionManager::isAuthenticated();
 $isAdmin = SessionManager::isAdmin();

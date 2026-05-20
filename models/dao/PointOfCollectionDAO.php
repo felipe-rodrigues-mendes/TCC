@@ -191,7 +191,7 @@ class PointOfCollectionDAO {
 
     private function setActiveStatus(int $pointId, int $activeValue): bool {
         if (!$this->supportsActiveColumn) {
-            error_log('A coluna ativo nao esta disponivel em ponto_coleta.');
+            error_log('A coluna ativo não está disponível em ponto_coleta.');
             return false;
         }
 
