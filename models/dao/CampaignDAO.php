@@ -214,7 +214,7 @@ class CampaignDAO {
     }
 
     /**
-     * Cadastra uma necessidade/card em uma campanha ativa.
+     * Cadastra uma necessidade/card em uma campanha.
      * @param int $campanhaId
      * @param int $categoriaId
      * @param string $descricao
@@ -238,6 +238,39 @@ class CampaignDAO {
 
         if (!$sucesso) {
             error_log('Erro ao cadastrar necessidade: ' . $stmt->error);
+        }
+
+        $stmt->close();
+        return $sucesso;
+    }
+
+    /**
+     * Atualiza descricao e quantidade de uma necessidade/card da campanha.
+     * @param int $necessidadeId
+     * @param int $campanhaId
+     * @param string $descricao
+     * @param int $quantidade
+     * @return bool
+     */
+    public function updateNecessidade(int $necessidadeId, int $campanhaId, string $descricao, int $quantidade): bool {
+        $sql = '
+            UPDATE necessidade
+            SET descricao = ?, quantidade_necessaria = ?
+            WHERE id_necessidade = ? AND id_campanha = ?
+            LIMIT 1
+        ';
+        $stmt = $this->conn->prepare($sql);
+
+        if (!$stmt) {
+            error_log('Erro ao preparar atualizacao de necessidade: ' . $this->conn->error);
+            return false;
+        }
+
+        $stmt->bind_param('siii', $descricao, $quantidade, $necessidadeId, $campanhaId);
+        $sucesso = $stmt->execute();
+
+        if (!$sucesso) {
+            error_log('Erro ao atualizar necessidade: ' . $stmt->error);
         }
 
         $stmt->close();
@@ -284,7 +317,7 @@ class CampaignDAO {
      * @return bool
      */
     public function deleteNecessidade(int $necessidadeId, int $campanhaId): bool {
-        $sql = 'DELETE FROM necessidade WHERE id_necessidade = ? LIMIT 1';
+        $sql = 'DELETE FROM necessidade WHERE id_necessidade = ? AND id_campanha = ? LIMIT 1';
         $stmt = $this->conn->prepare($sql);
 
         if (!$stmt) {
@@ -292,7 +325,7 @@ class CampaignDAO {
             return false;
         }
 
-        $stmt->bind_param('i', $necessidadeId);
+        $stmt->bind_param('ii', $necessidadeId, $campanhaId);
         $sucesso = $stmt->execute();
         $afetados = $stmt->affected_rows;
         $stmt->close();

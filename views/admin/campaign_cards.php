@@ -68,6 +68,14 @@ SessionManager::requireRole('admin');
         .need-card strong { display: block; margin-bottom: 6px; color: #0f172a; }
         .need-card div { color: #475569; line-height: 1.5; }
         .need-card span { display: inline-block; font-size: 14px; font-weight: 700; color: #1d4ed8; }
+        .need-card-edit { display: grid; gap: 10px; margin-top: 8px; }
+        .need-card-edit textarea,
+        .need-card-edit input {
+            width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 10px; font: inherit;
+        }
+        .need-card-edit textarea { min-height: 90px; resize: vertical; }
+        .need-card-edit button { border: 0; border-radius: 10px; padding: 10px 14px; color: #fff; font-weight: 700; cursor: pointer; background: #2563eb; }
+        .need-card-edit button:hover { background: #1d4ed8; }
         .card-actions { margin-top: 14px; display: flex; justify-content: flex-end; }
         .muted { color: #64748b; font-size: 14px; }
         .empty-state { padding: 18px; border-radius: 12px; background: #f8fafc; color: #64748b; border: 1px dashed #cbd5e1; }
@@ -193,8 +201,7 @@ SessionManager::requireRole('admin');
                                 <?php endif; ?>
 
 
-                                <?php if (!$isClosed): ?>
-                                    <form method="POST" action="index.php?page=admin_add_campaign_card" class="action-form">
+                                <form method="POST" action="index.php?page=admin_add_campaign_card" class="action-form">
                                         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(SessionManager::getCsrfToken()); ?>">
                                         <input type="hidden" name="campanha_id" value="<?php echo (int)$selectedCampaign->id; ?>">
                                         <div>
@@ -216,9 +223,8 @@ SessionManager::requireRole('admin');
                                             <label for="quantidade_necessaria">Quantidade necessária</label>
                                             <input type="number" name="quantidade_necessaria" id="quantidade_necessaria" min="1" required>
                                         </div>
-                                        <button type="submit">Adicionar item depois</button>
-                                    </form>
-                                <?php endif; ?>
+                                        <button type="submit">Adicionar item</button>
+                                </form>
 
                                 <details class="cards-toggle" id="cardsToggle_<?php echo (int)$selectedCampaign->id; ?>">
                                     <summary>Itens já cadastrados (<?php echo count($necessidades); ?>)</summary>
@@ -234,18 +240,28 @@ SessionManager::requireRole('admin');
                                         <?php foreach ($necessidades as $necessidade): ?>
                                             <article class="need-card">
                                                 <strong><?php echo htmlspecialchars($necessidade['categoria_nome']); ?></strong>
-                                                <div><?php echo htmlspecialchars($necessidade['descricao']); ?></div>
-                                                <span>Necessário: <?php echo (int)$necessidade['quantidade_necessaria']; ?></span>
-                                                <?php if (!$isClosed): ?>
-                                                    <div class="card-actions">
-                                                        <form method="POST" action="index.php?page=admin_delete_campaign_card">
-                                                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(SessionManager::getCsrfToken()); ?>">
-                                                            <input type="hidden" name="campanha_id" value="<?php echo (int)$selectedCampaign->id; ?>">
-                                                            <input type="hidden" name="necessidade_id" value="<?php echo (int)$necessidade['id']; ?>">
-                                                            <button type="submit" class="btn-danger">Excluir item</button>
-                                                        </form>
+                                                <form method="POST" action="index.php?page=admin_update_campaign_card" class="need-card-edit">
+                                                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(SessionManager::getCsrfToken()); ?>">
+                                                    <input type="hidden" name="campanha_id" value="<?php echo (int)$selectedCampaign->id; ?>">
+                                                    <input type="hidden" name="necessidade_id" value="<?php echo (int)$necessidade['id']; ?>">
+                                                    <div>
+                                                        <label for="descricao_necessidade_<?php echo (int)$necessidade['id']; ?>">Descrição</label>
+                                                        <textarea name="descricao" id="descricao_necessidade_<?php echo (int)$necessidade['id']; ?>" required><?php echo htmlspecialchars($necessidade['descricao']); ?></textarea>
                                                     </div>
-                                                <?php endif; ?>
+                                                    <div>
+                                                        <label for="quantidade_necessidade_<?php echo (int)$necessidade['id']; ?>">Quantidade necessária</label>
+                                                        <input type="number" name="quantidade_necessaria" id="quantidade_necessidade_<?php echo (int)$necessidade['id']; ?>" min="1" value="<?php echo (int)$necessidade['quantidade_necessaria']; ?>" required>
+                                                    </div>
+                                                    <button type="submit">Salvar item</button>
+                                                </form>
+                                                <div class="card-actions">
+                                                    <form method="POST" action="index.php?page=admin_delete_campaign_card" onsubmit="return confirm('Tem certeza que deseja excluir este item?');">
+                                                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(SessionManager::getCsrfToken()); ?>">
+                                                        <input type="hidden" name="campanha_id" value="<?php echo (int)$selectedCampaign->id; ?>">
+                                                        <input type="hidden" name="necessidade_id" value="<?php echo (int)$necessidade['id']; ?>">
+                                                        <button type="submit" class="btn-danger">Excluir item</button>
+                                                    </form>
+                                                </div>
                                             </article>
                                         <?php endforeach; ?>
                                     </div>

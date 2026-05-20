@@ -7,6 +7,10 @@ $nomePerfil = $usuarioPerfil ? $usuarioPerfil->nome : (SessionManager::getUserNa
 $tipoPerfilRaw = strtolower((string)($usuarioPerfil ? $usuarioPerfil->tipo : (SessionManager::getUserRole() ?? 'doador')));
 $tipoPerfilLabel = $tipoPerfilRaw === 'admin' ? 'Admin' : 'Doador';
 $fotoPerfil = trim((string)($usuarioPerfil ? $usuarioPerfil->foto_perfil : ''));
+$fotoPerfilPath = $fotoPerfil !== '' ? __DIR__ . '/../../' . ltrim($fotoPerfil, '/\\') : '';
+$fotoPerfilUrl = ($fotoPerfilPath !== '' && is_file($fotoPerfilPath))
+    ? $fotoPerfil . '?v=' . filemtime($fotoPerfilPath)
+    : '';
 ?>
 
 <!DOCTYPE html>
@@ -592,8 +596,8 @@ $fotoPerfil = trim((string)($usuarioPerfil ? $usuarioPerfil->foto_perfil : ''));
         <section class="profile-card" aria-label="Perfil do usuário">
             <label for="foto_perfil" class="profile-photo-trigger" title="Alterar foto de perfil">
                 <span class="profile-photo">
-                    <?php if ($fotoPerfil !== ''): ?>
-                        <img src="<?php echo htmlspecialchars($fotoPerfil); ?>" alt="Foto de perfil de <?php echo htmlspecialchars($nomePerfil); ?>">
+                    <?php if ($fotoPerfilUrl !== ''): ?>
+                        <img src="<?php echo htmlspecialchars($fotoPerfilUrl); ?>" alt="Foto de perfil de <?php echo htmlspecialchars($nomePerfil); ?>">
                     <?php else: ?>
                         <i class="fas fa-user"></i>
                     <?php endif; ?>

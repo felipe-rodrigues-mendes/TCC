@@ -67,6 +67,7 @@ $routes = [
     'admin_rename_campaign' => ['AdminController', 'renameCampaign'],
     'admin_upload_campaign_image' => ['AdminController', 'uploadCampaignImage'],
     'admin_add_campaign_card' => ['AdminController', 'addCampaignCard'],
+    'admin_update_campaign_card' => ['AdminController', 'updateCampaignCard'],
     'admin_promote_user' => ['AdminController', 'promoteUser'],
     'admin_demote_user' => ['AdminController', 'demoteUser'],
     'admin_toggle_user_status' => ['AdminController', 'toggleUserStatus'],
