@@ -84,6 +84,49 @@ SessionManager::requireRole('admin');
         .need-row-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
         .need-row-title { font-size: 14px; font-weight: 700; color: #0f172a; }
         .btn-linkish { border: 0; background: transparent; color: #dc2626; font-weight: 700; cursor: pointer; padding: 0; }
+        [data-theme="dark"] .panel-card,
+        [data-theme="dark"] .need-card {
+            background: var(--bg-surface);
+            border-color: var(--border-strong);
+        }
+        [data-theme="dark"] .panel-card h2,
+        [data-theme="dark"] .panel-card h3,
+        [data-theme="dark"] .need-card strong,
+        [data-theme="dark"] .need-row-title {
+            color: var(--texto);
+        }
+        [data-theme="dark"] .panel-card p,
+        [data-theme="dark"] .need-card div,
+        [data-theme="dark"] .muted {
+            color: var(--texto-suave);
+        }
+        [data-theme="dark"] .selector-form select,
+        [data-theme="dark"] .action-form select,
+        [data-theme="dark"] .action-form input,
+        [data-theme="dark"] .action-form textarea,
+        [data-theme="dark"] .need-card-edit input,
+        [data-theme="dark"] .need-card-edit textarea {
+            background: var(--bg-surface-soft);
+            border-color: var(--border-strong);
+            color: var(--texto);
+        }
+        [data-theme="dark"] .need-row,
+        [data-theme="dark"] .cards-toggle,
+        [data-theme="dark"] .cards-side-panel,
+        [data-theme="dark"] .empty-state {
+            background: var(--bg-surface-soft);
+            border-color: var(--border-strong);
+        }
+        [data-theme="dark"] .cards-toggle summary {
+            color: var(--texto);
+        }
+        [data-theme="dark"] .btn-secondary {
+            background: #2563eb;
+            color: #ffffff;
+        }
+        [data-theme="dark"] .btn-secondary:hover {
+            background: #1d4ed8;
+        }
         @media (max-width: 1280px) { .stacked-panels { grid-template-columns: 1fr; } .manage-layout.has-open-panel { grid-template-columns: 1fr; } }
     </style>
 </head>
