@@ -40,14 +40,20 @@ class DonationController {
         return __DIR__ . '/../assets/uploads/users';
     }
 
-    private function clearUserProfilePhotos(int $usuarioId): void {
-        $files = glob($this->getUserUploadDir() . '/user_' . $usuarioId . '.*');
+    private function clearUserProfilePhotos(int $usuarioId, ?string $keepPath = null): void {
+        $legacyFiles = glob($this->getUserUploadDir() . '/user_' . $usuarioId . '.*') ?: [];
+        $versionedFiles = glob($this->getUserUploadDir() . '/user_' . $usuarioId . '_*.*') ?: [];
+        $files = array_unique(array_merge($legacyFiles, $versionedFiles));
 
         if (!$files) {
             return;
         }
 
         foreach ($files as $file) {
+            if ($keepPath !== null && realpath($file) === realpath($keepPath)) {
+                continue;
+            }
+
             if (is_file($file)) {
                 @unlink($file);
             }
@@ -279,8 +285,8 @@ class DonationController {
             exit;
         }
 
-        if ((int)($arquivo['size'] ?? 0) > 2 * 1024 * 1024) {
-            SessionManager::setMessage('A imagem deve ter no máximo 2 MB.', 'erro');
+        if ((int)($arquivo['size'] ?? 0) > 5 * 1024 * 1024) {
+            SessionManager::setMessage('A imagem deve ter no máximo 5 MB.', 'erro');
             header('Location: index.php?page=dashboard');
             exit;
         }
@@ -323,9 +329,15 @@ class DonationController {
             exit;
         }
 
-        $this->clearUserProfilePhotos($usuarioId);
-        $relativePath = 'assets/uploads/users/user_' . $usuarioId . '.' . $extension;
-        $destination = $uploadDir . '/user_' . $usuarioId . '.' . $extension;
+        try {
+            $fileVersion = date('YmdHis') . '_' . bin2hex(random_bytes(4));
+        } catch (Exception $e) {
+            $fileVersion = date('YmdHis') . '_' . mt_rand(1000, 9999);
+        }
+
+        $fileName = 'user_' . $usuarioId . '_' . $fileVersion . '.' . $extension;
+        $relativePath = 'assets/uploads/users/' . $fileName;
+        $destination = $uploadDir . '/' . $fileName;
 
         if (!move_uploaded_file($tmpName, $destination)) {
             SessionManager::setMessage('Não foi possível salvar a foto de perfil.', 'erro');
@@ -339,6 +351,8 @@ class DonationController {
             header('Location: index.php?page=dashboard');
             exit;
         }
+
+        $this->clearUserProfilePhotos($usuarioId, $destination);
 
         SessionManager::setMessage('Foto de perfil atualizada com sucesso.', 'sucesso');
         header('Location: index.php?page=dashboard');

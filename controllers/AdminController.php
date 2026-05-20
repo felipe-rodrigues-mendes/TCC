@@ -790,7 +790,7 @@ class AdminController {
     }
 
     /**
-     * Cadastra um novo card/necessidade para uma campanha ativa.
+     * Cadastra um novo card/necessidade para uma campanha.
      */
     public function addCampaignCard(): void {
         $this->requireAdmin();
@@ -818,8 +818,8 @@ class AdminController {
         }
 
         $campanha = $this->campaignDAO->findById($campanhaId);
-        if (!$campanha || strtoupper((string)$campanha->status) !== 'ATIVA') {
-            SessionManager::setMessage('Selecione uma campanha ativa válida.', 'erro');
+        if (!$campanha) {
+            SessionManager::setMessage('Selecione uma campanha válida.', 'erro');
             header('Location: index.php?page=admin_campaign_cards');
             exit;
         }
@@ -834,6 +834,50 @@ class AdminController {
             SessionManager::setMessage('Card da campanha cadastrado com sucesso.', 'sucesso');
         } else {
             SessionManager::setMessage('Não foi possível cadastrar o card da campanha.', 'erro');
+        }
+
+        header('Location: index.php?page=admin_campaign_cards&campanha_id=' . $campanhaId);
+        exit;
+    }
+
+    /**
+     * Atualiza um card/necessidade existente da campanha.
+     */
+    public function updateCampaignCard(): void {
+        $this->requireAdmin();
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: index.php?page=admin_campaign_cards');
+            exit;
+        }
+
+        if (!SessionManager::validateCsrfToken($_POST['csrf_token'] ?? null)) {
+            SessionManager::setMessage('Sua sessão expirou. Atualize a página e tente novamente.', 'erro');
+            header('Location: index.php?page=admin_campaign_cards');
+            exit;
+        }
+
+        $campanhaId = (int)($_POST['campanha_id'] ?? 0);
+        $necessidadeId = (int)($_POST['necessidade_id'] ?? 0);
+        $descricao = trim((string)($_POST['descricao'] ?? ''));
+        $quantidade = (int)($_POST['quantidade_necessaria'] ?? 0);
+
+        if ($campanhaId <= 0 || $necessidadeId <= 0 || $descricao === '' || $quantidade <= 0) {
+            SessionManager::setMessage('Preencha descrição e quantidade corretamente.', 'erro');
+            header('Location: index.php?page=admin_campaign_cards&campanha_id=' . $campanhaId);
+            exit;
+        }
+
+        if (!$this->campaignDAO->findById($campanhaId)) {
+            SessionManager::setMessage('Campanha não encontrada.', 'erro');
+            header('Location: index.php?page=admin_campaign_cards');
+            exit;
+        }
+
+        if ($this->campaignDAO->updateNecessidade($necessidadeId, $campanhaId, $descricao, $quantidade)) {
+            SessionManager::setMessage('Item da campanha atualizado com sucesso.', 'sucesso');
+        } else {
+            SessionManager::setMessage('Não foi possível atualizar o item da campanha.', 'erro');
         }
 
         header('Location: index.php?page=admin_campaign_cards&campanha_id=' . $campanhaId);
