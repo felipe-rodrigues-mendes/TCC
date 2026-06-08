@@ -126,6 +126,13 @@ $fotoPerfilUrl = ($fotoPerfilPath !== '' && is_file($fotoPerfilPath))
             margin-top: 10px;
         }
 
+        .profile-photo-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
         .profile-upload-form input[type="file"] {
             position: absolute;
             width: 1px;
@@ -138,10 +145,33 @@ $fotoPerfilUrl = ($fotoPerfilPath !== '' && is_file($fotoPerfilPath))
             border: 0;
         }
 
-        .profile-upload-actions {
+        .profile-upload-actions,
+        .profile-remove-form {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
+        }
+
+        .profile-remove-form {
+            max-width: none;
+            padding: 0;
+            margin: 0;
+            background: transparent;
+            border: 0;
+            box-shadow: none;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-4px);
+            transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+            pointer-events: none;
+        }
+
+        .profile-card:hover .profile-remove-form,
+        .profile-card:focus-within .profile-remove-form {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            pointer-events: auto;
         }
 
         .profile-upload-form button {
@@ -609,16 +639,26 @@ $fotoPerfilUrl = ($fotoPerfilPath !== '' && is_file($fotoPerfilPath))
                     <i class="fas <?php echo $tipoPerfilRaw === 'admin' ? 'fa-user-shield' : 'fa-hand-holding-heart'; ?>"></i>
                     Tipo: <?php echo htmlspecialchars($tipoPerfilLabel); ?>
                 </span>
-                <form method="POST" action="index.php?page=profile_photo_update" enctype="multipart/form-data" class="profile-upload-form" id="profile-upload-form">
-                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(SessionManager::getCsrfToken()); ?>">
-                    <input type="file" name="foto_perfil" id="foto_perfil" accept="image/*" required>
-                    <div class="profile-upload-actions">
-                        <button type="submit" class="btn-secundario">
-                            <i class="fas fa-check"></i> Salvar foto
-                        </button>
-                    </div>
-                    <div class="profile-file-name" id="profile-file-name"></div>
-                </form>
+                <div class="profile-photo-actions">
+                    <form method="POST" action="index.php?page=profile_photo_update" enctype="multipart/form-data" class="profile-upload-form" id="profile-upload-form">
+                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(SessionManager::getCsrfToken()); ?>">
+                        <input type="file" name="foto_perfil" id="foto_perfil" accept="image/*" required>
+                        <div class="profile-upload-actions">
+                            <button type="submit" class="btn-secundario">
+                                <i class="fas fa-check"></i> Salvar foto
+                            </button>
+                        </div>
+                        <div class="profile-file-name" id="profile-file-name"></div>
+                    </form>
+                    <?php if ($fotoPerfilUrl !== ''): ?>
+                        <form method="POST" action="index.php?page=profile_photo_remove" class="profile-remove-form" onsubmit="return confirm('Remover sua foto de perfil?');">
+                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(SessionManager::getCsrfToken()); ?>">
+                            <button type="submit" class="btn-perigo">
+                                <i class="fas fa-user-minus"></i> Remover foto
+                            </button>
+                        </form>
+                    <?php endif; ?>
+                </div>
             </div>
         </section>
 
@@ -735,9 +775,9 @@ $fotoPerfilUrl = ($fotoPerfilPath !== '' && is_file($fotoPerfilPath))
 
         <?php if (SessionManager::getUserRole() !== 'admin'): ?>
             <section class="account-danger-zone" aria-labelledby="account-delete-title">
-                <h3 id="account-delete-title"><i class="fas fa-user-slash"></i> Excluir minha conta</h3>
-                <p>Ao excluir sua conta, seu acesso será removido e seus dados pessoais serão anonimizados. O histórico de doações permanece no sistema para controle das campanhas.</p>
-                <form method="POST" action="index.php?page=account_delete" class="account-delete-form" onsubmit="return confirm('Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.');">
+                <h3 id="account-delete-title"><i class="fas fa-user-slash"></i> Desativar minha conta</h3>
+                <p>Ao desativar sua conta, seu acesso será bloqueado e seus dados permanecerão preservados no sistema. O histórico de doações continua disponível para controle das campanhas.</p>
+                <form method="POST" action="index.php?page=account_deactivate" class="account-delete-form" onsubmit="return confirm('Tem certeza que deseja desativar sua conta? Você perderá o acesso até que a conta seja reativada por um administrador.');">
                     <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(SessionManager::getCsrfToken()); ?>">
                     <div class="account-delete-grid">
                         <div>
@@ -745,11 +785,11 @@ $fotoPerfilUrl = ($fotoPerfilPath !== '' && is_file($fotoPerfilPath))
                             <input type="password" id="senha_confirmacao" name="senha_confirmacao" autocomplete="current-password" required>
                         </div>
                         <button type="submit" class="btn-perigo">
-                            <i class="fas fa-trash"></i> Excluir conta
+                            <i class="fas fa-user-slash"></i> Desativar conta
                         </button>
                     </div>
                     <label class="account-delete-confirm">
-                        <input type="checkbox" name="confirmar_exclusao" value="1" required>
+                        <input type="checkbox" name="confirmar_desativacao" value="1" required>
                         Entendo que perderei o acesso a esta conta.
                     </label>
                 </form>

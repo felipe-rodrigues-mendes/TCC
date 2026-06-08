@@ -31,8 +31,8 @@ class AuthController {
             $tipoMensagem = 'sucesso';
         }
 
-        if (isset($_GET['conta']) && $_GET['conta'] === 'excluida') {
-            $mensagem = 'Sua conta foi excluída com sucesso.';
+        if (isset($_GET['conta']) && $_GET['conta'] === 'desativada') {
+            $mensagem = 'Sua conta foi desativada com sucesso.';
             $tipoMensagem = 'sucesso';
         }
 
@@ -196,9 +196,9 @@ class AuthController {
     }
 
     /**
-     * Exclui a própria conta do usuário autenticado.
+     * Desativa a própria conta do usuário autenticado.
      */
-    public function deleteAccount(): void {
+    public function deactivateAccount(): void {
         SessionManager::requireLogin('index.php?page=dashboard');
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -214,10 +214,10 @@ class AuthController {
 
         $usuarioId = (int)(SessionManager::getUserId() ?? 0);
         $senha = trim((string)($_POST['senha_confirmacao'] ?? ''));
-        $confirmacao = (string)($_POST['confirmar_exclusao'] ?? '');
+        $confirmacao = (string)($_POST['confirmar_desativacao'] ?? '');
 
         if ($usuarioId <= 0 || $senha === '' || $confirmacao !== '1') {
-            SessionManager::setMessage('Confirme a exclusão e informe sua senha atual.', 'erro');
+            SessionManager::setMessage('Confirme a desativação e informe sua senha atual.', 'erro');
             header('Location: index.php?page=dashboard');
             exit;
         }
@@ -230,26 +230,33 @@ class AuthController {
         }
 
         if ($usuario->tipo === 'admin') {
-            SessionManager::setMessage('Contas administrativas não podem ser excluídas por este fluxo.', 'erro');
+            SessionManager::setMessage('Contas administrativas não podem ser desativadas por este fluxo.', 'erro');
             header('Location: index.php?page=dashboard');
             exit;
         }
 
         if (!password_verify($senha, $usuario->senha_hash)) {
-            SessionManager::setMessage('Senha atual incorreta. A conta não foi excluída.', 'erro');
+            SessionManager::setMessage('Senha atual incorreta. A conta não foi desativada.', 'erro');
             header('Location: index.php?page=dashboard');
             exit;
         }
 
-        if (!$this->userDAO->deleteOwnAccount($usuarioId)) {
-            SessionManager::setMessage('Não foi possível excluir sua conta. Tente novamente.', 'erro');
+        if (!$this->userDAO->deactivateOwnAccount($usuarioId)) {
+            SessionManager::setMessage('Não foi possível desativar sua conta. Tente novamente.', 'erro');
             header('Location: index.php?page=dashboard');
             exit;
         }
 
         SessionManager::destroy();
-        header('Location: index.php?page=login&conta=excluida');
+        header('Location: index.php?page=login&conta=desativada');
         exit;
+    }
+
+    /**
+     * Alias mantido para compatibilidade com a rota antiga.
+     */
+    public function deleteAccount(): void {
+        $this->deactivateAccount();
     }
 
     /**
