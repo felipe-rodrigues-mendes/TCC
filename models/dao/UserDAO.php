@@ -464,64 +464,68 @@ class UserDAO {
     }
 
     /**
-     * Desativa e anonimiza a própria conta, preservando histórico relacionado.
+     * Remove a foto de perfil do usuario.
      * @param int $usuarioId
      * @return bool
      */
-    public function deleteOwnAccount(int $usuarioId): bool {
+    public function removeProfilePhoto(int $usuarioId): bool {
         if ($usuarioId <= 0) {
             return false;
         }
 
-        $nomeAnonimo = 'Conta excluída';
-        $emailAnonimo = 'conta-excluida-' . $usuarioId . '@anon.local';
-        $telefoneAnonimo = '';
-
-        try {
-            Database::getInstance()->beginTransaction();
-
-            $sqlLogin = 'DELETE FROM login WHERE id_usuario = ?';
-            $stmtLogin = $this->conn->prepare($sqlLogin);
-            if (!$stmtLogin) {
-                throw new Exception('Erro ao preparar remocao de login: ' . $this->conn->error);
-            }
-
-            $stmtLogin->bind_param('i', $usuarioId);
-            if (!$stmtLogin->execute()) {
-                throw new Exception('Erro ao remover login: ' . $stmtLogin->error);
-            }
-            $stmtLogin->close();
-
-            $sqlUsuario = '
-                UPDATE usuario
-                SET nome = ?,
-                    email = ?,
-                    telefone = ?,
-                    foto_perfil = NULL,
-                    ativo = 0
-                WHERE id_usuario = ?
-                LIMIT 1
-            ';
-            $stmtUsuario = $this->conn->prepare($sqlUsuario);
-            if (!$stmtUsuario) {
-                throw new Exception('Erro ao preparar exclusao da conta: ' . $this->conn->error);
-            }
-
-            $stmtUsuario->bind_param('sssi', $nomeAnonimo, $emailAnonimo, $telefoneAnonimo, $usuarioId);
-            if (!$stmtUsuario->execute()) {
-                throw new Exception('Erro ao excluir conta: ' . $stmtUsuario->error);
-            }
-
-            $afetados = $stmtUsuario->affected_rows;
-            $stmtUsuario->close();
-
-            Database::getInstance()->commit();
-            return $afetados >= 0;
-        } catch (Exception $e) {
-            Database::getInstance()->rollback();
-            error_log('Erro ao excluir própria conta: ' . $e->getMessage());
+        if (!$this->ensureProfilePhotoColumn()) {
             return false;
         }
+
+        $sql = 'UPDATE usuario SET foto_perfil = NULL WHERE id_usuario = ? AND ativo = 1 LIMIT 1';
+        $stmt = $this->conn->prepare($sql);
+
+        if (!$stmt) {
+            error_log('Erro ao preparar remocao da foto de perfil: ' . $this->conn->error);
+            return false;
+        }
+
+        $stmt->bind_param('i', $usuarioId);
+        $executou = $stmt->execute();
+        $afetados = $stmt->affected_rows;
+        $stmt->close();
+
+        return $executou && $afetados >= 0;
+    }
+
+    /**
+     * Desativa a própria conta, preservando cadastro, login e histórico relacionado.
+     * @param int $usuarioId
+     * @return bool
+     */
+    public function deactivateOwnAccount(int $usuarioId): bool {
+        if ($usuarioId <= 0) {
+            return false;
+        }
+
+        $sql = 'UPDATE usuario SET ativo = 0 WHERE id_usuario = ? AND ativo = 1 LIMIT 1';
+        $stmt = $this->conn->prepare($sql);
+
+        if (!$stmt) {
+            error_log('Erro ao preparar desativacao da propria conta: ' . $this->conn->error);
+            return false;
+        }
+
+        $stmt->bind_param('i', $usuarioId);
+        $executou = $stmt->execute();
+        $afetados = $stmt->affected_rows;
+        $stmt->close();
+
+        return $executou && $afetados > 0;
+    }
+
+    /**
+     * Alias mantido para compatibilidade com chamadas antigas.
+     * @param int $usuarioId
+     * @return bool
+     */
+    public function deleteOwnAccount(int $usuarioId): bool {
+        return $this->deactivateOwnAccount($usuarioId);
     }
 
     /**

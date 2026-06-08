@@ -359,6 +359,40 @@ class DonationController {
         exit;
     }
 
+    public function removeProfilePhoto(): void {
+        SessionManager::requireLogin('index.php?page=dashboard');
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: index.php?page=dashboard');
+            exit;
+        }
+
+        if (!SessionManager::validateCsrfToken($_POST['csrf_token'] ?? null)) {
+            SessionManager::setMessage('Sua sessão expirou. Atualize a página e tente novamente.', 'erro');
+            header('Location: index.php?page=dashboard');
+            exit;
+        }
+
+        $usuarioId = (int)(SessionManager::getUserId() ?? 0);
+        if ($usuarioId <= 0) {
+            SessionManager::setMessage('Usuário inválido para remover a foto.', 'erro');
+            header('Location: index.php?page=dashboard');
+            exit;
+        }
+
+        if (!$this->userDAO->removeProfilePhoto($usuarioId)) {
+            SessionManager::setMessage('Não foi possível remover sua foto do cadastro.', 'erro');
+            header('Location: index.php?page=dashboard');
+            exit;
+        }
+
+        $this->clearUserProfilePhotos($usuarioId);
+
+        SessionManager::setMessage('Foto de perfil removida com sucesso.', 'sucesso');
+        header('Location: index.php?page=dashboard');
+        exit;
+    }
+
     public function editForm(): void {
         SessionManager::requireLogin('index.php?page=dashboard');
 
