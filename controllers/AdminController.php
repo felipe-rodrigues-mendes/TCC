@@ -303,6 +303,7 @@ class AdminController {
                 throw new Exception('Não foi possível cadastrar o ponto informado.');
             }
 
+            $this->inventoryDAO->getOrCreateEstoque($pointId);
             Database::getInstance()->commit();
             $this->redirectToCollectionPointsWithMessage('Ponto de coleta cadastrado com sucesso.', 'sucesso');
         } catch (Exception $e) {
