@@ -368,6 +368,42 @@ class AdminController {
     }
 
     /**
+     * Exclui um ponto de coleta cadastrado.
+     */
+    public function deleteCollectionPoint(): void {
+        $this->requireAdmin();
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: index.php?page=admin_collection_points');
+            exit;
+        }
+
+        if (!SessionManager::validateCsrfToken($_POST['csrf_token'] ?? null)) {
+            $this->redirectToCollectionPointsWithMessage('Sua sessão expirou. Atualize a página e tente novamente.');
+        }
+
+        $pointId = (int)($_POST['ponto_id'] ?? 0);
+        if ($pointId <= 0) {
+            $this->redirectToCollectionPointsWithMessage('Ponto de coleta inválido.');
+        }
+
+        $ponto = $this->pointDAO->findById($pointId);
+        if ($ponto === null) {
+            $this->redirectToCollectionPointsWithMessage('Ponto de coleta não encontrado.');
+        }
+
+        if ($this->pointDAO->hasDonations($pointId)) {
+            $this->redirectToCollectionPointsWithMessage('Não é possível excluir este ponto porque ele está vinculado a doações. Desative-o para impedir novas doações.');
+        }
+
+        if (!$this->pointDAO->delete($pointId)) {
+            $this->redirectToCollectionPointsWithMessage('Não foi possível excluir o ponto de coleta selecionado.');
+        }
+
+        $this->redirectToCollectionPointsWithMessage('Ponto de coleta excluído com sucesso.', 'sucesso');
+    }
+
+    /**
      * Renderiza gestão de cards de campanha e permissões de admin.
      */
     public function manageCampaignCards(): void {

@@ -60,6 +60,7 @@ $routes = [
     'admin_collection_points' => ['AdminController', 'manageCollectionPoints'],
     'admin_create_collection_point' => ['AdminController', 'createCollectionPoint'],
     'admin_toggle_collection_point_status' => ['AdminController', 'toggleCollectionPointStatus'],
+    'admin_delete_collection_point' => ['AdminController', 'deleteCollectionPoint'],
     'admin_campaign_cards' => ['AdminController', 'manageCampaignCards'],
     'admin_create_campaign' => ['AdminController', 'createCampaign'],
     'admin_delete_campaign_card' => ['AdminController', 'deleteCampaignCard'],
