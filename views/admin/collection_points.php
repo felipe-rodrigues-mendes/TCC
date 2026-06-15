@@ -210,18 +210,7 @@ SessionManager::requireRole('admin');
                                         </button>
                                     </form>
 
-                                    <?php if (!$pontoAtivo): ?>
-                                        <form method="POST"
-                                              action="index.php?page=admin_delete_collection_point"
-                                              class="inline-form"
-                                              onsubmit="return confirm('Excluir permanentemente este ponto de coleta?');">
-                                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(SessionManager::getCsrfToken()); ?>">
-                                            <input type="hidden" name="ponto_id" value="<?php echo (int)($ponto['id'] ?? 0); ?>">
-                                            <button type="submit" class="danger-button">
-                                                Excluir ponto
-                                            </button>
-                                        </form>
-                                    <?php endif; ?>
+                                    <!-- Botão de excluir removido; mantém apenas ativar/desativar para preservar histórico -->
                                 </div>
                             </div>
                         </article>
