@@ -1342,6 +1342,14 @@ form button:hover{
     text-decoration: underline;
 }
 
+.contact-channel-body .contact-instagram-link{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+    color: #e1306c;
+}
+
 .contact-channel-body strong{
     color: var(--texto);
 }

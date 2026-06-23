@@ -66,6 +66,9 @@ $totalCidadesContato = isset($totalCidadesContato) ? (int)$totalCidadesContato :
                     <h2>E-mail</h2>
                     <p>Envie solicitações, parcerias e comunicações institucionais.</p>
                     <a href="mailto:ConectaSolidaria@gmail.com">ConectaSolidaria@gmail.com</a>
+                    <a class="contact-instagram-link" href="https://www.instagram.com/conecta_solidaria/" target="_blank" rel="noopener noreferrer">
+                        <i class="fab fa-instagram" aria-hidden="true"></i> @conecta_solidaria
+                    </a>
                 </div>
             </article>
 
