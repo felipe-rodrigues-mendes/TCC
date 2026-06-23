@@ -71,6 +71,19 @@ $totalCidadesContato = isset($totalCidadesContato) ? (int)$totalCidadesContato :
 
             <article class="contact-channel-card">
                 <div class="contact-channel-icon">
+                    <i class="fab fa-instagram"></i>
+                </div>
+                <div class="contact-channel-body">
+                    <h2>Instagram</h2>
+                    <p>Acompanhe nossas campanhas, ações e novidades.</p>
+                    <a href="https://www.instagram.com/conecta_solidaria/" target="_blank" rel="noopener noreferrer">
+                        @conecta_solidaria
+                    </a>
+                </div>
+            </article>
+
+            <article class="contact-channel-card">
+                <div class="contact-channel-icon">
                     <i class="fas fa-clock"></i>
                 </div>
                 <div class="contact-channel-body">
@@ -158,6 +171,9 @@ $totalCidadesContato = isset($totalCidadesContato) ? (int)$totalCidadesContato :
 
 <footer>
     <p>&copy; 2026 ConectaSolidária</p>
+    <a class="footer-social-link" href="https://www.instagram.com/conecta_solidaria/" target="_blank" rel="noopener noreferrer" aria-label="Instagram do ConectaSolidária">
+        <i class="fab fa-instagram" aria-hidden="true"></i> @conecta_solidaria
+    </a>
 </footer>
 
 </body>

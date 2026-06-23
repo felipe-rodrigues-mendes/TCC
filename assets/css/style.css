@@ -842,7 +842,7 @@ section{
     color: white;
 }
 
-/* FORMUL¡RIO */
+/* FORMUL√ÅRIO */
 form{
     max-width: 600px;
     background: var(--bg-surface);
@@ -1526,6 +1526,29 @@ footer{
     position: relative;
     bottom: 0;
     left: 0;
+}
+
+.footer-social-link{
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 8px;
+    color: var(--footer-text);
+    font-weight: 700;
+    text-decoration: none;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.footer-social-link:hover,
+.footer-social-link:focus-visible{
+    color: #f9a8d4;
+    transform: translateY(-1px);
+}
+
+.footer-social-link:focus-visible{
+    outline: 2px solid currentColor;
+    outline-offset: 4px;
+    border-radius: 4px;
 }
 
 /* FEEDBACK */
