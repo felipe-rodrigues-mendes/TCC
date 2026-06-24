@@ -63,6 +63,30 @@ class AdminController {
         return __DIR__ . '/../assets/uploads';
     }
 
+    private function resolveCampaignImage(int $campaignId, string $titulo): string {
+        foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
+            $relativePath = 'assets/uploads/campaign_' . $campaignId . '.' . $ext;
+            $absolutePath = __DIR__ . '/../' . $relativePath;
+
+            if (is_file($absolutePath)) {
+                return $relativePath;
+            }
+        }
+
+        $fallbacks = [
+            'Rio Grande do Sul' => 'assets/images/enchente Rio Grande do Sul.jpg',
+            'Bahia' => 'assets/images/enchente Bahia.jpg',
+            'Minas Gerais' => 'assets/images/Minas gerais.jpg',
+            'Sao Paulo' => 'assets/images/enchente Sao paulo.jpg',
+            'São Paulo' => 'assets/images/enchente Sao paulo.jpg',
+            'Santa Catarina' => 'assets/images/santa catarina.jpg',
+            'Parana' => 'assets/images/Parána.jpg',
+            'Paraná' => 'assets/images/Parána.jpg',
+        ];
+
+        return $fallbacks[$titulo] ?? 'assets/images/logo.PNG';
+    }
+
     /**
      * Remove imagens já existentes da campanha.
      */
@@ -412,6 +436,10 @@ class AdminController {
         $campanhas = $this->campaignDAO->findAll();
         $categorias = $this->itemDAO->findAll();
 
+        foreach ($campanhas as $campanha) {
+            $campanha->imagem = $this->resolveCampaignImage((int)$campanha->id, (string)$campanha->titulo);
+        }
+
         $selectedCampaignId = isset($_GET['campanha_id']) ? (int)$_GET['campanha_id'] : 0;
         if ($selectedCampaignId <= 0 && !empty($campanhas)) {
             $selectedCampaignId = (int)$campanhas[0]->id;
@@ -422,6 +450,7 @@ class AdminController {
         if ($selectedCampaignId > 0) {
             $selectedCampaign = $this->campaignDAO->findById($selectedCampaignId, false);
             if ($selectedCampaign) {
+                $selectedCampaign->imagem = $this->resolveCampaignImage((int)$selectedCampaign->id, (string)$selectedCampaign->titulo);
                 $necessidades = $this->campaignDAO->getNecessidades($selectedCampaignId);
             }
         }
