@@ -54,13 +54,16 @@ class CampaignDAO {
      * @param int $id
      * @return CampaignDTO|null
      */
-    public function findById(int $id): ?CampaignDTO {
+    public function findById(int $id, bool $includeDeleted = true): ?CampaignDTO {
         $sql = '
             SELECT id_campanha AS id, titulo, descricao, data_inicio, data_fim, status, id_usuario
             FROM campanha
             WHERE id_campanha = ?
-            LIMIT 1
         ';
+        if (!$includeDeleted) {
+            $sql .= ' AND excluida = 0';
+        }
+        $sql .= ' LIMIT 1';
         $stmt = $this->conn->prepare($sql);
 
         if (!$stmt) {

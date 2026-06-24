@@ -420,7 +420,7 @@ class AdminController {
         $selectedCampaign = null;
         $necessidades = [];
         if ($selectedCampaignId > 0) {
-            $selectedCampaign = $this->campaignDAO->findById($selectedCampaignId);
+            $selectedCampaign = $this->campaignDAO->findById($selectedCampaignId, false);
             if ($selectedCampaign) {
                 $necessidades = $this->campaignDAO->getNecessidades($selectedCampaignId);
             }
@@ -619,6 +619,12 @@ class AdminController {
             exit;
         }
 
+        if (!$this->campaignDAO->findById($campanhaId, false)) {
+            SessionManager::setMessage('Campanha nao encontrada.', 'erro');
+            header('Location: index.php?page=admin_campaign_cards');
+            exit;
+        }
+
         try {
             if ($this->campaignDAO->deleteNecessidade($necessidadeId, $campanhaId)) {
             SessionManager::setMessage('Card removido com sucesso.', 'sucesso');
@@ -653,6 +659,12 @@ class AdminController {
         $campanhaId = (int)($_POST['campanha_id'] ?? 0);
         if ($campanhaId <= 0) {
             SessionManager::setMessage('Selecione uma campanha válida para enviar a imagem.', 'erro');
+            header('Location: index.php?page=admin_campaign_cards');
+            exit;
+        }
+
+        if (!$this->campaignDAO->findById($campanhaId, false)) {
+            SessionManager::setMessage('Campanha nao encontrada.', 'erro');
             header('Location: index.php?page=admin_campaign_cards');
             exit;
         }
@@ -798,7 +810,7 @@ class AdminController {
             exit;
         }
 
-        if (!$this->campaignDAO->findById($campanhaId)) {
+        if (!$this->campaignDAO->findById($campanhaId, false)) {
             SessionManager::setMessage('Campanha nao encontrada.', 'erro');
             header('Location: index.php?page=admin_campaign_cards');
             exit;
@@ -841,7 +853,7 @@ class AdminController {
             exit;
         }
 
-        $campanha = $this->campaignDAO->findById($campanhaId);
+        $campanha = $this->campaignDAO->findById($campanhaId, false);
         if (!$campanha) {
             SessionManager::setMessage('Campanha não encontrada.', 'erro');
             header('Location: index.php?page=admin_campaign_cards');
@@ -895,7 +907,7 @@ class AdminController {
             exit;
         }
 
-        $campanha = $this->campaignDAO->findById($campanhaId);
+        $campanha = $this->campaignDAO->findById($campanhaId, false);
         if (!$campanha) {
             SessionManager::setMessage('Selecione uma campanha válida.', 'erro');
             header('Location: index.php?page=admin_campaign_cards');
@@ -946,7 +958,7 @@ class AdminController {
             exit;
         }
 
-        if (!$this->campaignDAO->findById($campanhaId)) {
+        if (!$this->campaignDAO->findById($campanhaId, false)) {
             SessionManager::setMessage('Campanha não encontrada.', 'erro');
             header('Location: index.php?page=admin_campaign_cards');
             exit;
