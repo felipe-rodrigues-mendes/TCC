@@ -30,41 +30,8 @@ class DistributionController {
         SessionManager::requireRole('admin');
     }
 
-    private function normalizeText(string $value): string {
-        $normalized = trim($value);
-        $ascii = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $normalized);
-
-        if ($ascii !== false) {
-            $normalized = $ascii;
-        }
-
-        $normalized = strtolower($normalized);
-
-        // Remove separadores para comparações estáveis.
-        return preg_replace('/[^a-z0-9]+/', '', $normalized) ?? '';
-    }
-
-    private function getAllowedStockPoints(): array {
-        $allowedTerms = ['taguatinga', 'ceilandia'];
-        $points = $this->pointDAO->findAll();
-
-        return array_values(array_filter($points, function (array $point) use ($allowedTerms) {
-            $haystacks = [
-                $this->normalizeText((string)($point['nome'] ?? '')),
-                $this->normalizeText((string)($point['cidade'] ?? '')),
-                $this->normalizeText((string)($point['logradouro'] ?? '')),
-            ];
-
-            foreach ($haystacks as $haystack) {
-                foreach ($allowedTerms as $term) {
-                    if ($haystack !== '' && str_contains($haystack, $term)) {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        }));
+    private function getActiveStockPoints(): array {
+        return $this->pointDAO->findAll(true);
     }
 
     private function redirectWithMessage(string $mensagem, string $tipo = 'erro'): void {
@@ -109,7 +76,7 @@ class DistributionController {
         $flash = SessionManager::getMessage();
         $mensagem = $flash['mensagem'] ?? '';
         $tipoMensagem = $flash['tipo'] ?? '';
-        $pontos = $this->getAllowedStockPoints();
+        $pontos = $this->getActiveStockPoints();
         $campanhas = $this->campaignDAO->findAllActive();
         $destinos = $this->destinationDAO->findAll(true);
         $instituicoes = $this->destinationDAO->findAll(false);
@@ -237,7 +204,7 @@ class DistributionController {
             $this->redirectWithMessage('Selecione um ponto de estoque para distribuir os itens.');
         }
 
-        $allowedPontos = $this->getAllowedStockPoints();
+        $allowedPontos = $this->getActiveStockPoints();
         $allowedPointIds = array_map('intval', array_column($allowedPontos, 'id'));
         if (!in_array($pontoId, $allowedPointIds, true)) {
             $this->redirectWithMessage('O ponto de estoque selecionado não está disponível para distribuição.');

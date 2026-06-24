@@ -146,14 +146,18 @@ SessionManager::requireRole('admin');
                             <?php echo htmlspecialchars($dados['logradouro']); ?>
                         </div>
 
-                        <ul class="itens-lista">
-                            <?php foreach ($dados['itens'] as $item): ?>
-                                <li>
-                                    <span><?php echo htmlspecialchars($item['item']); ?></span>
-                                    <span class="qtd-badge"><?php echo (int)$item['quantidade']; ?></span>
-                                </li>
-                            <?php endforeach; ?>
-                        </ul>
+                        <?php if (empty($dados['itens'])): ?>
+                            <p class="muted">Este ponto ainda não possui itens em estoque.</p>
+                        <?php else: ?>
+                            <ul class="itens-lista">
+                                <?php foreach ($dados['itens'] as $item): ?>
+                                    <li>
+                                        <span><?php echo htmlspecialchars($item['item']); ?></span>
+                                        <span class="qtd-badge"><?php echo (int)$item['quantidade']; ?></span>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        <?php endif; ?>
                     </div>
                 <?php endforeach; ?>
             </div>
@@ -163,6 +167,9 @@ SessionManager::requireRole('admin');
 
 <footer>
     <p>© 2026 ConectaSolidária</p>
+    <a class="footer-social-link" href="https://www.instagram.com/conecta_solidaria/" target="_blank" rel="noopener noreferrer" aria-label="Instagram do ConectaSolidária">
+        <i class="fab fa-instagram" aria-hidden="true"></i> @conecta_solidaria
+    </a>
 </footer>
 
 </body>

@@ -100,6 +100,14 @@ SessionManager::requireRole('admin');
             padding: 10px 14px;
         }
 
+        .point-item-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
         .danger-button {
             background: #dc2626;
             color: #fff;
@@ -189,17 +197,21 @@ SessionManager::requireRole('admin');
                                     <div class="muted">CEP: <?php echo htmlspecialchars($cep); ?></div>
                                 </div>
 
-                                <form method="POST"
-                                      action="index.php?page=admin_toggle_collection_point_status"
-                                      class="inline-form"
-                                      onsubmit="return confirm('<?php echo $pontoAtivo ? 'Desativar este ponto para impedir novas doações nele?' : 'Ativar este ponto para liberar novas doações nele?'; ?>');">
-                                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(SessionManager::getCsrfToken()); ?>">
-                                    <input type="hidden" name="ponto_id" value="<?php echo (int)($ponto['id'] ?? 0); ?>">
-                                    <input type="hidden" name="novo_status" value="<?php echo $pontoAtivo ? 'desativar' : 'ativar'; ?>">
-                                    <button type="submit" class="<?php echo $pontoAtivo ? 'danger-button' : 'activate-button'; ?>">
-                                        <?php echo $pontoAtivo ? 'Desativar ponto' : 'Ativar ponto'; ?>
-                                    </button>
-                                </form>
+                                <div class="point-item-actions">
+                                    <form method="POST"
+                                          action="index.php?page=admin_toggle_collection_point_status"
+                                          class="inline-form"
+                                          onsubmit="return confirm('<?php echo $pontoAtivo ? 'Desativar este ponto para impedir novas doações nele?' : 'Ativar este ponto para liberar novas doações nele?'; ?>');">
+                                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(SessionManager::getCsrfToken()); ?>">
+                                        <input type="hidden" name="ponto_id" value="<?php echo (int)($ponto['id'] ?? 0); ?>">
+                                        <input type="hidden" name="novo_status" value="<?php echo $pontoAtivo ? 'desativar' : 'ativar'; ?>">
+                                        <button type="submit" class="<?php echo $pontoAtivo ? 'danger-button' : 'activate-button'; ?>">
+                                            <?php echo $pontoAtivo ? 'Desativar ponto' : 'Ativar ponto'; ?>
+                                        </button>
+                                    </form>
+
+                                    <!-- Botão de excluir removido; mantém apenas ativar/desativar para preservar histórico -->
+                                </div>
                             </div>
                         </article>
                     <?php endforeach; ?>
@@ -211,6 +223,9 @@ SessionManager::requireRole('admin');
 
 <footer>
     <p>© 2026 ConectaSolidária</p>
+    <a class="footer-social-link" href="https://www.instagram.com/conecta_solidaria/" target="_blank" rel="noopener noreferrer" aria-label="Instagram do ConectaSolidária">
+        <i class="fab fa-instagram" aria-hidden="true"></i> @conecta_solidaria
+    </a>
 </footer>
 
 </body>

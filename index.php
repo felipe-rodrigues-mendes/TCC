@@ -60,10 +60,11 @@ $routes = [
     'admin_collection_points' => ['AdminController', 'manageCollectionPoints'],
     'admin_create_collection_point' => ['AdminController', 'createCollectionPoint'],
     'admin_toggle_collection_point_status' => ['AdminController', 'toggleCollectionPointStatus'],
+    'admin_delete_collection_point' => ['AdminController', 'deleteCollectionPoint'],
     'admin_campaign_cards' => ['AdminController', 'manageCampaignCards'],
     'admin_create_campaign' => ['AdminController', 'createCampaign'],
     'admin_delete_campaign_card' => ['AdminController', 'deleteCampaignCard'],
-    'admin_delete_campaign' => ['AdminController', 'closeCampaign'],
+    'admin_delete_campaign' => ['AdminController', 'deleteCampaign'],
     'admin_close_campaign' => ['AdminController', 'closeCampaign'],
     'admin_reopen_campaign' => ['AdminController', 'reopenCampaign'],
     'admin_rename_campaign' => ['AdminController', 'renameCampaign'],
@@ -222,6 +223,9 @@ function notFound($mensagem) {
 
         <footer>
             <p>© 2026 ConectaSolidária</p>
+            <a class="footer-social-link" href="https://www.instagram.com/conecta_solidaria/" target="_blank" rel="noopener noreferrer" aria-label="Instagram do ConectaSolidária">
+                <i class="fab fa-instagram" aria-hidden="true"></i> @conecta_solidaria
+            </a>
         </footer>
     </body>
     </html>
@@ -345,6 +349,9 @@ function error($mensagem = "Ocorreu um erro interno ao processar sua requisiçã
 
         <footer>
             <p>© 2026 ConectaSolidária</p>
+            <a class="footer-social-link" href="https://www.instagram.com/conecta_solidaria/" target="_blank" rel="noopener noreferrer" aria-label="Instagram do ConectaSolidária">
+                <i class="fab fa-instagram" aria-hidden="true"></i> @conecta_solidaria
+            </a>
         </footer>
     </body>
     </html>

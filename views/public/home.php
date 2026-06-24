@@ -171,6 +171,9 @@ if ($primeiraCampanha) {
 
 <footer>
     <p>© 2026 ConectaSolidária</p>
+    <a class="footer-social-link" href="https://www.instagram.com/conecta_solidaria/" target="_blank" rel="noopener noreferrer" aria-label="Instagram do ConectaSolidária">
+        <i class="fab fa-instagram" aria-hidden="true"></i> @conecta_solidaria
+    </a>
 </footer>
 
 </body>

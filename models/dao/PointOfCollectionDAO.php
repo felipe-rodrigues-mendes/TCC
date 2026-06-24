@@ -240,6 +240,98 @@ class PointOfCollectionDAO {
         return $this->setActiveStatus($pointId, 0);
     }
 
+    public function hasDonations(int $pointId): bool {
+        $sql = 'SELECT 1 FROM doacao WHERE id_ponto = ? LIMIT 1';
+        $stmt = $this->conn->prepare($sql);
+
+        if (!$stmt) {
+            error_log('Erro ao preparar verificação de doações para ponto de coleta: ' . $this->conn->error);
+            return false;
+        }
+
+        $stmt->bind_param('i', $pointId);
+        $stmt->execute();
+        $resultado = $stmt->get_result();
+        $hasDonations = $resultado ? $resultado->num_rows > 0 : false;
+        $stmt->close();
+
+        return $hasDonations;
+    }
+
+    public function delete(int $pointId): bool {
+        $ponto = $this->findById($pointId);
+        if (!$ponto) {
+            return false;
+        }
+
+        $addressId = (int)($ponto['endereco_id'] ?? 0);
+
+        if (!$this->conn->begin_transaction()) {
+            error_log('Erro ao iniciar transação para exclusão de ponto de coleta: ' . $this->conn->error);
+            return false;
+        }
+
+        try {
+            $sqlDeleteItems = 'DELETE ie FROM item_estoque ie INNER JOIN estoque es ON ie.id_estoque = es.id_estoque WHERE es.id_ponto = ?';
+            $stmtItems = $this->conn->prepare($sqlDeleteItems);
+            if (!$stmtItems) {
+                throw new Exception('Erro ao preparar exclusão de itens de estoque.');
+            }
+            $stmtItems->bind_param('i', $pointId);
+            if (!$stmtItems->execute()) {
+                throw new Exception('Erro ao excluir itens de estoque: ' . $stmtItems->error);
+            }
+            $stmtItems->close();
+
+            $sqlDeleteEstoque = 'DELETE FROM estoque WHERE id_ponto = ?';
+            $stmtEstoque = $this->conn->prepare($sqlDeleteEstoque);
+            if (!$stmtEstoque) {
+                throw new Exception('Erro ao preparar exclusão de estoque.');
+            }
+            $stmtEstoque->bind_param('i', $pointId);
+            if (!$stmtEstoque->execute()) {
+                throw new Exception('Erro ao excluir estoque: ' . $stmtEstoque->error);
+            }
+            $stmtEstoque->close();
+
+            $sqlDeletePoint = 'DELETE FROM ponto_coleta WHERE id_ponto = ?';
+            $stmtPoint = $this->conn->prepare($sqlDeletePoint);
+            if (!$stmtPoint) {
+                throw new Exception('Erro ao preparar exclusão de ponto de coleta.');
+            }
+            $stmtPoint->bind_param('i', $pointId);
+            if (!$stmtPoint->execute()) {
+                throw new Exception('Erro ao excluir ponto de coleta: ' . $stmtPoint->error);
+            }
+            $stmtPoint->close();
+
+            if ($addressId > 0) {
+                $sqlDeleteAddress = '
+                    DELETE e
+                    FROM endereco e
+                    LEFT JOIN ponto_coleta pc ON pc.id_endereco = e.id_endereco
+                    LEFT JOIN destino d ON d.id_endereco = e.id_endereco
+                    WHERE e.id_endereco = ?
+                      AND pc.id_endereco IS NULL
+                      AND d.id_endereco IS NULL
+                ';
+                $stmtAddress = $this->conn->prepare($sqlDeleteAddress);
+                if ($stmtAddress) {
+                    $stmtAddress->bind_param('i', $addressId);
+                    $stmtAddress->execute();
+                    $stmtAddress->close();
+                }
+            }
+
+            $this->conn->commit();
+            return true;
+        } catch (Exception $e) {
+            $this->conn->rollback();
+            error_log('Erro ao excluir ponto de coleta: ' . $e->getMessage());
+            return false;
+        }
+    }
+
     public function create(string $nome, string $logradouro, string $cidade, string $estado, string $cep): ?int {
         $sqlAddress = 'INSERT INTO endereco (logradouro, cidade, estado, cep) VALUES (?, ?, ?, ?)';
         $stmtAddress = $this->conn->prepare($sqlAddress);

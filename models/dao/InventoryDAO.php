@@ -131,11 +131,12 @@ class InventoryDAO {
                 ci.id_categoria AS categoria_id,
                 ci.nome AS item,
                 ie.quantidade
-            FROM item_estoque ie
-            INNER JOIN estoque es ON ie.id_estoque = es.id_estoque
-            INNER JOIN ponto_coleta pc ON es.id_ponto = pc.id_ponto
+            FROM ponto_coleta pc
             INNER JOIN endereco e ON pc.id_endereco = e.id_endereco
-            INNER JOIN categoria_item ci ON ie.id_categoria = ci.id_categoria
+            LEFT JOIN estoque es ON es.id_ponto = pc.id_ponto
+            LEFT JOIN item_estoque ie ON ie.id_estoque = es.id_estoque
+            LEFT JOIN categoria_item ci ON ie.id_categoria = ci.id_categoria
+            WHERE pc.ativo = 1
             ORDER BY pc.nome ASC, ci.nome ASC
         ';
 
@@ -158,11 +159,13 @@ class InventoryDAO {
                 ];
             }
 
-            $estoquesAgrupados[$ponto]['itens'][] = [
-                'categoria_id' => $linha['categoria_id'],
-                'item' => $linha['item'],
-                'quantidade' => $linha['quantidade']
-            ];
+            if ($linha['categoria_id'] !== null) {
+                $estoquesAgrupados[$ponto]['itens'][] = [
+                    'categoria_id' => $linha['categoria_id'],
+                    'item' => $linha['item'],
+                    'quantidade' => $linha['quantidade']
+                ];
+            }
         }
 
         return $estoquesAgrupados;

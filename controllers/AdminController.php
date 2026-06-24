@@ -303,6 +303,7 @@ class AdminController {
                 throw new Exception('Não foi possível cadastrar o ponto informado.');
             }
 
+            $this->inventoryDAO->getOrCreateEstoque($pointId);
             Database::getInstance()->commit();
             $this->redirectToCollectionPointsWithMessage('Ponto de coleta cadastrado com sucesso.', 'sucesso');
         } catch (Exception $e) {
@@ -367,6 +368,42 @@ class AdminController {
     }
 
     /**
+     * Exclui um ponto de coleta cadastrado.
+     */
+    public function deleteCollectionPoint(): void {
+        $this->requireAdmin();
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: index.php?page=admin_collection_points');
+            exit;
+        }
+
+        if (!SessionManager::validateCsrfToken($_POST['csrf_token'] ?? null)) {
+            $this->redirectToCollectionPointsWithMessage('Sua sessão expirou. Atualize a página e tente novamente.');
+        }
+
+        $pointId = (int)($_POST['ponto_id'] ?? 0);
+        if ($pointId <= 0) {
+            $this->redirectToCollectionPointsWithMessage('Ponto de coleta inválido.');
+        }
+
+        $ponto = $this->pointDAO->findById($pointId);
+        if ($ponto === null) {
+            $this->redirectToCollectionPointsWithMessage('Ponto de coleta não encontrado.');
+        }
+
+        if ($this->pointDAO->hasDonations($pointId)) {
+            $this->redirectToCollectionPointsWithMessage('Não é possível excluir este ponto porque ele está vinculado a doações. Desative-o para impedir novas doações.');
+        }
+
+        if (!$this->pointDAO->delete($pointId)) {
+            $this->redirectToCollectionPointsWithMessage('Não foi possível excluir o ponto de coleta selecionado.');
+        }
+
+        $this->redirectToCollectionPointsWithMessage('Ponto de coleta excluído com sucesso.', 'sucesso');
+    }
+
+    /**
      * Renderiza gestão de cards de campanha e permissões de admin.
      */
     public function manageCampaignCards(): void {
@@ -383,7 +420,7 @@ class AdminController {
         $selectedCampaign = null;
         $necessidades = [];
         if ($selectedCampaignId > 0) {
-            $selectedCampaign = $this->campaignDAO->findById($selectedCampaignId);
+            $selectedCampaign = $this->campaignDAO->findById($selectedCampaignId, false);
             if ($selectedCampaign) {
                 $necessidades = $this->campaignDAO->getNecessidades($selectedCampaignId);
             }
@@ -582,6 +619,12 @@ class AdminController {
             exit;
         }
 
+        if (!$this->campaignDAO->findById($campanhaId, false)) {
+            SessionManager::setMessage('Campanha nao encontrada.', 'erro');
+            header('Location: index.php?page=admin_campaign_cards');
+            exit;
+        }
+
         try {
             if ($this->campaignDAO->deleteNecessidade($necessidadeId, $campanhaId)) {
             SessionManager::setMessage('Card removido com sucesso.', 'sucesso');
@@ -616,6 +659,12 @@ class AdminController {
         $campanhaId = (int)($_POST['campanha_id'] ?? 0);
         if ($campanhaId <= 0) {
             SessionManager::setMessage('Selecione uma campanha válida para enviar a imagem.', 'erro');
+            header('Location: index.php?page=admin_campaign_cards');
+            exit;
+        }
+
+        if (!$this->campaignDAO->findById($campanhaId, false)) {
+            SessionManager::setMessage('Campanha nao encontrada.', 'erro');
             header('Location: index.php?page=admin_campaign_cards');
             exit;
         }
@@ -738,6 +787,47 @@ class AdminController {
     }
 
     /**
+     * Remove a campanha da listagem sem apagar historico de doacoes/distribuicoes.
+     */
+    public function deleteCampaign(): void {
+        $this->requireAdmin();
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: index.php?page=admin_campaign_cards');
+            exit;
+        }
+
+        if (!SessionManager::validateCsrfToken($_POST['csrf_token'] ?? null)) {
+            SessionManager::setMessage('Sua sessao expirou. Atualize a pagina e tente novamente.', 'erro');
+            header('Location: index.php?page=admin_campaign_cards');
+            exit;
+        }
+
+        $campanhaId = (int)($_POST['campanha_id'] ?? 0);
+        if ($campanhaId <= 0) {
+            SessionManager::setMessage('Campanha invalida para exclusao.', 'erro');
+            header('Location: index.php?page=admin_campaign_cards');
+            exit;
+        }
+
+        if (!$this->campaignDAO->findById($campanhaId, false)) {
+            SessionManager::setMessage('Campanha nao encontrada.', 'erro');
+            header('Location: index.php?page=admin_campaign_cards');
+            exit;
+        }
+
+        if ($this->campaignDAO->softDeleteCampaign($campanhaId)) {
+            SessionManager::setMessage('Campanha excluida da listagem com sucesso. O historico foi preservado.', 'sucesso');
+            header('Location: index.php?page=admin_campaign_cards');
+            exit;
+        }
+
+        SessionManager::setMessage('Nao foi possivel excluir a campanha selecionada.', 'erro');
+        header('Location: index.php?page=admin_campaign_cards&campanha_id=' . $campanhaId);
+        exit;
+    }
+
+    /**
      * Atualiza o nome de uma campanha.
      */
     public function renameCampaign(): void {
@@ -763,7 +853,7 @@ class AdminController {
             exit;
         }
 
-        $campanha = $this->campaignDAO->findById($campanhaId);
+        $campanha = $this->campaignDAO->findById($campanhaId, false);
         if (!$campanha) {
             SessionManager::setMessage('Campanha não encontrada.', 'erro');
             header('Location: index.php?page=admin_campaign_cards');
@@ -817,7 +907,7 @@ class AdminController {
             exit;
         }
 
-        $campanha = $this->campaignDAO->findById($campanhaId);
+        $campanha = $this->campaignDAO->findById($campanhaId, false);
         if (!$campanha) {
             SessionManager::setMessage('Selecione uma campanha válida.', 'erro');
             header('Location: index.php?page=admin_campaign_cards');
@@ -868,7 +958,7 @@ class AdminController {
             exit;
         }
 
-        if (!$this->campaignDAO->findById($campanhaId)) {
+        if (!$this->campaignDAO->findById($campanhaId, false)) {
             SessionManager::setMessage('Campanha não encontrada.', 'erro');
             header('Location: index.php?page=admin_campaign_cards');
             exit;

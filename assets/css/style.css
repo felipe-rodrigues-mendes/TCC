@@ -842,7 +842,7 @@ section{
     color: white;
 }
 
-/* FORMUL¡RIO */
+/* FORMUL√ÅRIO */
 form{
     max-width: 600px;
     background: var(--bg-surface);
@@ -1286,13 +1286,13 @@ form button:hover{
 
 .contact-channel-grid{
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 14px;
 }
 
 .contact-channel-card{
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 12px;
     background: var(--bg-surface);
     border: 1px solid var(--cinza-borda);
@@ -1318,6 +1318,7 @@ form button:hover{
     display: flex;
     flex-direction: column;
     gap: 4px;
+    min-width: 0;
 }
 
 .contact-channel-body h2{
@@ -1336,6 +1337,7 @@ form button:hover{
     color: var(--link);
     text-decoration: none;
     font-weight: 700;
+    overflow-wrap: anywhere;
 }
 
 .contact-channel-body a:hover{
@@ -1499,6 +1501,10 @@ form button:hover{
 }
 
 @media (max-width: 768px){
+    .contact-channel-grid{
+        grid-template-columns: 1fr;
+    }
+
     .contact-hero{
         padding: 22px 18px;
     }
@@ -1526,6 +1532,29 @@ footer{
     position: relative;
     bottom: 0;
     left: 0;
+}
+
+.footer-social-link{
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 8px;
+    color: var(--footer-text);
+    font-weight: 700;
+    text-decoration: none;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.footer-social-link:hover,
+.footer-social-link:focus-visible{
+    color: #f9a8d4;
+    transform: translateY(-1px);
+}
+
+.footer-social-link:focus-visible{
+    outline: 2px solid currentColor;
+    outline-offset: 4px;
+    border-radius: 4px;
 }
 
 /* FEEDBACK */

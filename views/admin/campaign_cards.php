@@ -243,6 +243,12 @@ SessionManager::requireRole('admin');
                                     </form>
                                 <?php endif; ?>
 
+                                <form method="POST" action="index.php?page=admin_delete_campaign" class="action-form" onsubmit="return confirm('Excluir esta campanha da listagem? O historico de doacoes e distribuicoes sera preservado.');">
+                                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(SessionManager::getCsrfToken()); ?>">
+                                    <input type="hidden" name="campanha_id" value="<?php echo (int)$selectedCampaign->id; ?>">
+                                    <button type="submit" class="btn-danger">Excluir campanha</button>
+                                </form>
+
 
                                 <form method="POST" action="index.php?page=admin_add_campaign_card" class="action-form">
                                         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(SessionManager::getCsrfToken()); ?>">
@@ -322,6 +328,9 @@ SessionManager::requireRole('admin');
 
 <footer>
     <p>© 2026 ConectaSolidária</p>
+    <a class="footer-social-link" href="https://www.instagram.com/conecta_solidaria/" target="_blank" rel="noopener noreferrer" aria-label="Instagram do ConectaSolidária">
+        <i class="fab fa-instagram" aria-hidden="true"></i> @conecta_solidaria
+    </a>
 </footer>
 
 <script>
