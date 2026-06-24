@@ -27,7 +27,7 @@ class CampaignDAO {
         $sql = '
             SELECT id_campanha AS id, titulo, descricao, data_inicio, data_fim, status, id_usuario
             FROM campanha
-            WHERE status = \'ATIVA\'
+            WHERE status = \'ATIVA\' AND excluida = 0
             ORDER BY titulo ASC
         ';
         $resultado = $this->conn->query($sql);
@@ -94,7 +94,7 @@ class CampaignDAO {
         $sql = '
             SELECT id_campanha AS id, titulo, descricao, data_inicio, data_fim, status, id_usuario
             FROM campanha
-            WHERE titulo = ? AND status = \'ATIVA\'
+            WHERE titulo = ? AND status = \'ATIVA\' AND excluida = 0
             LIMIT 1
         ';
         $stmt = $this->conn->prepare($sql);
@@ -163,6 +163,7 @@ class CampaignDAO {
         $sql = '
             SELECT id_campanha AS id, titulo, descricao, data_inicio, data_fim, status, id_usuario
             FROM campanha
+            WHERE excluida = 0
             ORDER BY titulo ASC
         ';
         $resultado = $this->conn->query($sql);
@@ -339,7 +340,7 @@ class CampaignDAO {
      * @return bool
      */
     public function closeCampaign(int $campanhaId): bool {
-        $sql = "UPDATE campanha SET status = 'ENCERRADA' WHERE id_campanha = ? AND status <> 'ENCERRADA' LIMIT 1";
+        $sql = "UPDATE campanha SET status = 'ENCERRADA' WHERE id_campanha = ? AND status <> 'ENCERRADA' AND excluida = 0 LIMIT 1";
         $stmt = $this->conn->prepare($sql);
 
         if (!$stmt) {
@@ -361,7 +362,7 @@ class CampaignDAO {
      * @return bool
      */
     public function reopenCampaign(int $campanhaId): bool {
-        $sql = "UPDATE campanha SET status = 'ATIVA' WHERE id_campanha = ? AND status <> 'ATIVA' LIMIT 1";
+        $sql = "UPDATE campanha SET status = 'ATIVA' WHERE id_campanha = ? AND status <> 'ATIVA' AND excluida = 0 LIMIT 1";
         $stmt = $this->conn->prepare($sql);
 
         if (!$stmt) {
@@ -384,7 +385,7 @@ class CampaignDAO {
      * @return bool
      */
     public function renameCampaign(int $campanhaId, string $titulo): bool {
-        $sql = 'UPDATE campanha SET titulo = ? WHERE id_campanha = ? LIMIT 1';
+        $sql = 'UPDATE campanha SET titulo = ? WHERE id_campanha = ? AND excluida = 0 LIMIT 1';
         $stmt = $this->conn->prepare($sql);
 
         if (!$stmt) {
@@ -398,6 +399,28 @@ class CampaignDAO {
         $stmt->close();
 
         return $sucesso && $afetados >= 0;
+    }
+
+    /**
+     * Oculta uma campanha da gestao e dos cards publicos sem apagar historico.
+     * @param int $campanhaId
+     * @return bool
+     */
+    public function softDeleteCampaign(int $campanhaId): bool {
+        $sql = 'UPDATE campanha SET excluida = 1 WHERE id_campanha = ? AND excluida = 0 LIMIT 1';
+        $stmt = $this->conn->prepare($sql);
+
+        if (!$stmt) {
+            error_log('Erro ao preparar exclusao logica de campanha: ' . $this->conn->error);
+            return false;
+        }
+
+        $stmt->bind_param('i', $campanhaId);
+        $sucesso = $stmt->execute();
+        $afetados = $stmt->affected_rows;
+        $stmt->close();
+
+        return $sucesso && $afetados > 0;
     }
 }
 

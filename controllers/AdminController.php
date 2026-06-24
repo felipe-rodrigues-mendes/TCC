@@ -775,6 +775,47 @@ class AdminController {
     }
 
     /**
+     * Remove a campanha da listagem sem apagar historico de doacoes/distribuicoes.
+     */
+    public function deleteCampaign(): void {
+        $this->requireAdmin();
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: index.php?page=admin_campaign_cards');
+            exit;
+        }
+
+        if (!SessionManager::validateCsrfToken($_POST['csrf_token'] ?? null)) {
+            SessionManager::setMessage('Sua sessao expirou. Atualize a pagina e tente novamente.', 'erro');
+            header('Location: index.php?page=admin_campaign_cards');
+            exit;
+        }
+
+        $campanhaId = (int)($_POST['campanha_id'] ?? 0);
+        if ($campanhaId <= 0) {
+            SessionManager::setMessage('Campanha invalida para exclusao.', 'erro');
+            header('Location: index.php?page=admin_campaign_cards');
+            exit;
+        }
+
+        if (!$this->campaignDAO->findById($campanhaId)) {
+            SessionManager::setMessage('Campanha nao encontrada.', 'erro');
+            header('Location: index.php?page=admin_campaign_cards');
+            exit;
+        }
+
+        if ($this->campaignDAO->softDeleteCampaign($campanhaId)) {
+            SessionManager::setMessage('Campanha excluida da listagem com sucesso. O historico foi preservado.', 'sucesso');
+            header('Location: index.php?page=admin_campaign_cards');
+            exit;
+        }
+
+        SessionManager::setMessage('Nao foi possivel excluir a campanha selecionada.', 'erro');
+        header('Location: index.php?page=admin_campaign_cards&campanha_id=' . $campanhaId);
+        exit;
+    }
+
+    /**
      * Atualiza o nome de uma campanha.
      */
     public function renameCampaign(): void {

@@ -125,10 +125,27 @@ CREATE TABLE IF NOT EXISTS campanha (
   data_inicio DATE NOT NULL,
   data_fim DATE DEFAULT NULL,
   status ENUM('ATIVA', 'ENCERRADA') NOT NULL DEFAULT 'ATIVA',
+  excluida TINYINT(1) NOT NULL DEFAULT 0,
   id_usuario INT NOT NULL,
   CONSTRAINT fk_campanha_usuario
     FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario)
 ) ENGINE=InnoDB;
+
+SET @campanha_excluida_exists := (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE()
+    AND TABLE_NAME = 'campanha'
+    AND COLUMN_NAME = 'excluida'
+);
+SET @campanha_excluida_sql := IF(
+  @campanha_excluida_exists = 0,
+  'ALTER TABLE campanha ADD COLUMN excluida TINYINT(1) NOT NULL DEFAULT 0 AFTER status',
+  'SELECT 1'
+);
+PREPARE stmt_campanha_excluida FROM @campanha_excluida_sql;
+EXECUTE stmt_campanha_excluida;
+DEALLOCATE PREPARE stmt_campanha_excluida;
 
 CREATE TABLE IF NOT EXISTS categoria_item (
   id_categoria INT AUTO_INCREMENT PRIMARY KEY,
